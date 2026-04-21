@@ -1,0 +1,16 @@
+# tar
+- 묶음/압축
+tar -cvzf <fileName> <path>
+: tar -cvzf test.tar.gz /app/sw/repository/
+
+- 묶음/압축 해지
+tar -xvzf <fileName>
+: tar -xvzf test.tar.gz
+
+- 특정 경로 묶음/압축 해지
+tar -xvzf <fileName> -C /path
+: tar -xvzf test.tar.gz -C /app/sw/repository/
+
+# sh
+- shell 파일 실행 시, true 붙여주는 것이 좋음
+: sh ./start.sh || true
