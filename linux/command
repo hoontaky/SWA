@@ -78,7 +78,7 @@ useradd -g <groupName> <userName>
 : useradd -g webadm uapproval
 
 # CPU 사용률
-top -bn1 | grep "Cpu(s)" | awk '{prinf("CPU Usage : %.1f%%\n", 100-$8)}'
+top -bn1 | grep "Cpu(s)" | awk '{print("CPU Usage : %.1f%%\n", 100-$8)}'
 
 #jstat 사용법
 jstat -gcutil -h 20 ${PID} 2000 >> 상위 20개만 XX 2초 간격으로 %로 표출
