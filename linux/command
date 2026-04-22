@@ -68,6 +68,7 @@ cat << EOF >> aa.txt
 > EOF
 
 head -n 3 aa.txt | tail -n 2 >> 2 3
+>> aa.txt 파일의 위의 3줄만 갖고 와서 마지막 2번째 줄만 표시
 
 # 그룹 생성
 groupadd <groupName>
