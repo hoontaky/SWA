@@ -1,16 +1,85 @@
 # tar
-- 묶음/압축
+tar 파일 만들기
+tar -cf <fildName> <targetFileName>
+: tar -cf temp.tar ./tmp1.txt
+
+tar 파일 내용 보기
+tar -tvf <fileName>
+: tar -tvf temp.tar
+
+tar 파일에 파일 추가
+tar -rf <tarFileName> <targetFileName>
+: tar -rf temp.tar temp2.txt
+
+묶음/압축
 tar -cvzf <fileName> <path>
 : tar -cvzf test.tar.gz /app/sw/repository/
 
-- 묶음/압축 해지
+묶음/압축 해지
 tar -xvzf <fileName>
 : tar -xvzf test.tar.gz
 
-- 특정 경로 묶음/압축 해지
+특정 경로 묶음/압축 해지
 tar -xvzf <fileName> -C /path
 : tar -xvzf test.tar.gz -C /app/sw/repository/
 
 # sh
-- shell 파일 실행 시, true 붙여주는 것이 좋음
+shell 파일 실행 시, true 붙여주는 것이 좋음
 : sh ./start.sh || true
+
+# 업로드 경로 찾을 때(Linux)
+du --max-depth 1 -h(k/m도 가능)
+: du --max-depth 1 -h /data
+
+# 업로드 경로 찾을 때(Unix)
+du -k | perl -ne 'prin if (tr#/#/# ==1)'
+
+# 스토리지 찾을 때
+df -h
+
+# 폴더 경로 보고자 할 때
+tree <path> -L <level>
+: tree /data -L 3
+
+# rpm(yum) 설치된 패키지 확인
+rpm -qa | grep <package>
+: rpm -qa | grep nmap >> nmap-ncat-6.40-19.amzn2.0.1.x86_64
+
+which <package>
+: which nc >> /usr/bin/nc
+
+# 방화벽 확인
+nc -w 1 -i 1 -v <ip> <port>
+: nc -w 1 -i 1 -v 192.168.0.1 8090
+
+# head/tail
+head -n <headLvel> <fileName>
+: head -n 3 aa.txt
+
+head -n <headLvel> <fileName> | tail -n <tailLevel>
+: head -n 3 aa.txt | tail -n 2
+
+cat << EOF >> aa.txt
+> 1
+> 2
+> 3
+> 4
+> 5
+> EOF
+
+head -n 3 aa.txt | tail -n 2 >> 2 3
+
+# 그룹 생성
+groupadd <groupName>
+: groupadd webadm
+
+# 유저 생성
+useradd -g <groupName> <userName>
+: useradd -g webadm uapproval
+
+# CPU 사용률
+top -bn1 | grep "Cpu(s)" | awk '{prinf("CPU Usage : %.1f%%\n", 100-$8)}'
+
+#jstat 사용법
+jstat -gcutil -h 20 ${PID} 2000 >> 상위 20개만 XX 2초 간격으로 %로 표출
+jstat -gc -h 20 ${PID} 2000 >>    상위 20개만 XX 2초 간격으로 숫차로 표출
