@@ -1,4 +1,4 @@
 # 폐쇄망일 경우, anonymous access 허용 필요
 
 # library 이관
-: 기존 환경의 repository 폴더를 그대로 타 환경의 repository 경로로 복사해도 그대로 작동 함 
+: 기존 환경의 repository 폴더를 그대로 타 환경의 repository 경로로 복사해도 그대로 작동 함
