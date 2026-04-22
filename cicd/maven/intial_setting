@@ -38,3 +38,9 @@
  <activeProfiles>
    <activeProfile>nexus</activeProfile>
  </activeProfiles>
+ 
+2. Jenkins 등록
+ 2-1. Jenkins 관리 > System에서 Global MAVEN_OPTS 정보 등록(conf까지 등록 필요)
+ : /opt/apache-maven-3.8.5/conf
+ 2-2. Jenkins 관리 > Tools에서 Maven installations 정보 등록(groovy 스크립트에서 tool 사용 시 필요)(maven까지 등록 필요)
+ : /opt/apache-maven-3.8.5

@@ -1,2 +1,4 @@
-# plugin 이관
+1. plugin 이관
 : 기존 환경의 plugins 폴더를 그대로 타 환경의 plugins 경로로 복사해도 그대로 작동 함 
+
+2. Jenkins URL 등록 시, localhost(127.0.01)은 안 좋음
