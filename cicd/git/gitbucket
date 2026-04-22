@@ -1,0 +1,19 @@
+# gitbucket-jenkins webhook 연동
+1. Jenkins
+  1-1. generic-webhook-trigger plugins을 설치
+  1-2. job > 구성 진입
+  1-3. triggers에 "Generic Webhook Tigger" 클릭
+  1-4. Variable: ref
+       Expression: $.ref
+  1-5. Token 등록(추후 gitbucket payload url에 활용)
+  1-6. Optional filter 설정(trigger branch 관련 정보)
+    1-6-1. Expression: refs/heads/<branchName>
+    1-6-2. Text: $ref
+    
+2. Gitbucket
+  2-1. project > settings > service hooks 진입
+  2-2. webhook 등록 버튼 클릭
+  2-3. payload url 입력
+    : http://<jenkins_url>/generic-webhook-trigger/invoke?token=<jenkins에 등록한 토큰>
+  2-4. content type 입력
+    : application/json
