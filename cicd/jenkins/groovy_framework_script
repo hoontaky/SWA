@@ -1,0 +1,161 @@
+// removeBackupData 함수 정의: 백업 데이터 제거 함수
+def removeBackupData(file_path, keep_count) {
+    // file_path 경로의 파일 개수 확인
+    def file_count_str = sh (
+        script: ‘ls $file_path | wc -l’,
+        returnStdout: true
+    ).trim()
+    // 파일 개수를 정수형으로 변환
+    def file_count = Integer.parseInt(file_count_str)
+    // 파일 개수가 보관할 개수보다 많으면 실행
+    if (file_count > keep_count) {
+        // 오래된 파일 목록을 시간 순서로 정렬하여 가져옴
+        def files = sh (
+        // 파일 목록을 시간 역순(-t) 및 역순(-r)으로 정렬하여 쉘 명령어로 가져옴
+            script: ‘ls $file_path -t -r’,
+            // 쉘 명령어의 출력 결과를 문자열로 반환
+            returnStdout: true
+        )
+        // 파일 목록을 배열로 분리
+        def file_list = files.split('\\r?\\n')
+        // 파일 이름을 저장할 변수를 초기화
+        def file_name = ''
+        // 보관할 파일 개수를 제외한 나머지 파일 삭제
+        for (int inx = 0; inx < (file_count - keep_count); inx++) {
+            // 삭제할 파일 이름을 리스트에서 가져옴
+            file_name = file_list[inx].trim()
+            // 삭제할 파일 이름을 로그로 출력
+            echo ‘removed file name : [$file_name]’
+            // 파일 삭제 명령어 실행
+            sh ‘/usr/bin/rm -rf $file_path/$file_name’
+        }
+}
+}
+
+node {
+    // 현재 워크스페이스 경로 저장
+    def workspace = pwd()
+    // Jenkins Job 이름 저장
+    def jobName = JOB_NAME
+    // Git 저장소 URL 설정
+    def appGitUrl = 'http://192.168.56.1:40100'
+    // Git 브랜치 설정
+    def appGitBranch = 'develop'
+    // 보관할 파일 개수 설정
+    def filesToKeep = 3
+
+    stage('Jenkins Start') {
+        // 현재 워크스페이스 경로 출력
+        echo workspace
+        // 워크스페이스 정리
+        cleanWs()
+    }
+
+     stage('Gitlab Checkout') {
+    try {
+        // 워크스페이스 정리: 작업 공간의 임시 파일 및 이전 빌드 데이터를 정리합니다.
+        step([$class: 'WsCleanup'])
+        
+        // Git에서 소스 코드 체크아웃
+        checkout([
+            // GitSCM 클래스 사용하여 Git 레포지토리에서 소스 코드 가져옴
+            $class: 'GitSCM',
+            // 체크아웃할 브랜치 지정
+            branches: [[name: appGitBranch]],
+            // 서브모듈 설정 생성을 비활성화
+            doGenerateSubmoduleConfigurations: false,
+            // 이전 체크아웃을 정리하고 새로 체크아웃
+            extensions: [[$class: 'CleanCheckout']],
+            // 서브모듈 설정을 비워 둠
+            submoduleCfg: [],
+            // 원격 저장소 설정
+            userRemoteConfigs: [[
+                // 자격 증명 ID 설정
+                credentialsId: 'jenkins',
+                // 레포지토리의 브랜치와 병합 요청을 모두 가져오기 위한 refspec 설정
+                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/merge-requests/*/head:refs/remotes/origin/merge-requests/*',
+                // Git 리포지토리 URL 설정
+                url: appGitUrl + appGitRepo
+            ]]
+        ])
+    } catch (err) {
+        // Git 체크아웃 실패 시 에러 메시지 출력
+        buildDescription '[Error Occurred(Git Checkout Failed) :: ' + err.getMessage() + ']'
+        // 예외 발생 시 예외 메시지를 포함하여 새로운 예외를 발생시킴
+        throw new Exception(err.getMessage())
+    }
+}
+
+     stage('Maven Build') {
+    try {
+        // Maven 환경 변수 설정 및 빌드 실행
+        // withEnv는 제공된 환경 변수로 명령을 실행할 때 사용
+        withEnv([‘MAVEN_HOME=${tool 'MAVEN_HOME'}’]) {
+            // Maven 빌드를 수행하는 쉘 명령을 실행
+            // -X: 디버그 출력
+            // -Dmaven.test.skip=true: 테스트 건너뛰기
+            // -U: 종속성 강제 업데이트
+            sh ‘${MAVEN_HOME}/bin/mvn clean install -X -Dmaven.test.skip=true -U’
+        }
+    } catch (err) {
+        // Maven 빌드 실패 시 에러 메시지 출력
+        // buildDescription으로 빌드 설명을 업데이트
+        buildDescription '[Error Occurred(Maven Build Failed) :: ' + err.getMessage() + ']'
+        // 예외를 발생시켜 빌드 실패로 표시
+        throw new Exception(err.getMessage())
+    }
+}
+     stage('Backup') { // ‘Backup’ 단계를 선언합니다.
+    try {
+        // 백업 경로 설정
+        def jar_backup_path = '/data/backup/' + jobName // 백업 파일을 저장할 경로를 jobName을 사용하여 설정합니다.
+        def build_file = '' // 빌드 파일 이름을 저장할 변수를 초기화합니다.
+        def build_path = workspace + '/target' // 빌드 파일이 위치한 경로를 설정합니다.
+        
+        // 백업 경로가 존재하는지 확인
+        def webBackupPathRes = sh ( // 쉘 명령을 실행하여 백업 경로가 존재하는지 확인합니다.
+            script: ‘test -d $jar_backup_path && echo 1 || echo 2’, // 백업 경로가 존재하면 1, 존재하지 않으면 2를 반환하는 명령어입니다.
+            returnStdout: true // 명령어의 출력을 반환합니다.
+        ).trim() // 출력에서 공백을 제거합니다.
+        
+        // 백업 경로가 없으면 생성
+        if (webBackupPathRes == '2') { // 백업 경로가 존재하지 않으면
+            sh 'mkdir -p ' + jar_backup_path // mkdir 명령어를 사용하여 백업 경로를 생성합니다.
+        }
+        
+        // 빌드 경로로 이동하여 JAR 파일 백업
+        dir(build_path) { // 빌드 파일이 위치한 경로로 이동합니다.
+            // 빌드된 JAR 파일 찾기
+            def files = findFiles(glob: ‘**/*.jar’) // 빌드 경로에서 JAR 파일을 찾습니다.
+            build_file = files[0].name // 첫 번째 JAR 파일의 이름을 저장합니다.
+            
+            // 현재 날짜와 시간으로 백업 파일 이름 생성
+            def now = new Date() // 현재 날짜와 시간을 가져옵니다.
+            def currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul')) // 날짜와 시간을 특정 형식으로 포맷합니다.
+            def backupFile = currentDate + '-' + build_file // 백업 파일 이름을 날짜와 빌드 파일 이름으로 설정합니다.
+            
+            // JAR 파일을 백업 경로로 이동
+            sh ‘/bin/mv $build_path/$build_file $jar_backup_path/$backupFile’ 
+            // mv 명령어를 사용하여 JAR 파일을 백업 경로로 이동합니다.
+            
+            // 백업 데이터 정리
+            removeBackupData(jar_backup_path, filesToKeep) // 오래된 백업 파일을 삭제하여 백업 데이터를 정리합니다.
+        }
+    } catch (err) {
+        // 백업 실패 시 에러 메시지 출력
+        buildDescription '[Error Occurred(Backup Failed) :: ' + err.getMessage() + ']' // 백업 실패 시 에러 메시지를 출력합니다.
+        throw new Exception(err.getMessage()) // 예외를 발생시켜 빌드를 실패로 처리합니다.
+    }
+}
+    stage('Cleanup') {
+        // 임시 워크스페이스 디렉토리 정리
+        dir(‘${env.WORKSPACE}@tmp’) {
+            deleteDir()
+        }
+    }
+
+    stage('Complete') {
+        // 작업 완료 메시지 출력
+        echo 'Job Complete'
+    }
+}
