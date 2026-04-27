@@ -1,25 +1,26 @@
 def removeBackupData(remote, file_path, keep_count) {
-  // 원격 서버에서 오래된 백업 데이터를 제거하는 함수
-  // 기존 백업 파일 수 가져오기
-  def file_count_str = sshCommand(remote: remote, command: 'ls ' + file_path + ' | wc -l')  // 파일 경로와 명령 결합
-  def file_count = Integer.parseIn(file_count_str)  // 문자열을 정수로 변환
-   // 유지해야 할 최대 파일 수보다 기존 파일 수가 많은지 확인
-  if (file_count > keep_count) {
-    // 삭제할 파일 목록 가져오기 (수정 시간 기준 오래된 순으로 정렬)
-    def files = sshCommand(remote: remote, command: 'ls ' + file_path + ' -t -r')
-// 수정 시간 기준으로 파일 나열
-    // 파일 목록을 개별 파일 이름으로 분할
-    def file_list = files.split('\\r?\\n')
-// 개행문으로 분할
-    // 삭제할 파일 수만큼 반복 (최대 유지 수 초과 파일만 삭제)
-    for (int inx = 0; inx < (file_count - keep_count); inx++) {
-    // 삭제할 파일 이름 출력 (정보 제공)
-      echo ‘삭제할 파일 이름: [${file_list[inx].trim()}]’
-    // 원격 서버의 'rm' 명령을 사용하여 특정 파일 삭제
-      sshCommand(remote: remote, command: '/usr/bin/rm -rf ' + file_path + '/' + file_list[inx].trim())  // 전체 파일 경로 구성 및 삭제 실행
-    }
-  }
+	// 원격 서버에서 오래된 백업 데이터를 제거하는 함수
+  	// 기존 백업 파일 수 가져오기
+  	def file_count_str = sshCommand(remote: remote, command: 'ls ' + file_path + ' | wc -l')  // 파일 경로와 명령 결합
+  	def file_count = Integer.parseIn(file_count_str)  // 문자열을 정수로 변환
+   	// 유지해야 할 최대 파일 수보다 기존 파일 수가 많은지 확인
+  	if (file_count > keep_count) {
+    	// 삭제할 파일 목록 가져오기 (수정 시간 기준 오래된 순으로 정렬)
+    	def files = sshCommand(remote: remote, command: 'ls ' + file_path + ' -t -r')
+		// 수정 시간 기준으로 파일 나열
+    	// 파일 목록을 개별 파일 이름으로 분할
+    	def file_list = files.split('\\r?\\n')
+		// 개행문으로 분할
+    	// 삭제할 파일 수만큼 반복 (최대 유지 수 초과 파일만 삭제)
+    	for (int inx = 0; inx < (file_count - keep_count); inx++) {
+    		// 삭제할 파일 이름 출력 (정보 제공)
+      		echo '삭제할 파일 이름: [${file_list[inx].trim()}]'
+    		// 원격 서버의 'rm' 명령을 사용하여 특정 파일 삭제
+      		sshCommand(remote: remote, command: '/usr/bin/rm -rf ' + file_path + '/' + file_list[inx].trim())  // 전체 파일 경로 구성 및 삭제 실행
+    	}
+  	}
 }
+
 // 젠킨스 파이프라인 시작
 node {
     def workspace = pwd() // 현재 작업 디렉토리
@@ -43,11 +44,13 @@ node {
     def cssValue = '1' // CSS 처리 값
     def genJsCnt = 2 // JS 생성 횟수
     def filesToKeep = 3 // 백업 파일 보관 개수
+    
     // Jenkins 시작 단계
     stage('Jenkins Start'){
         echo workspace // 현재 작업 디렉토리 출력
         cleanWs() // 작업 디렉토리 정리
     }
+    
     // GitLab 체크아웃 단계
     stage('Gitlab Checkout'){
         try {
@@ -69,38 +72,41 @@ node {
             throw new Exception(err.getMessage()) // 에러 발생 시 예외 던지기
         }
     }
-// JS 파일 생성 단계
-// 초기화 변수 src 설정
-def src = ''
-// genJsCnt 변수에 설정된 값만큼 반복 실행
-for (int inx = 1; inx <= genJsCnt; inx++) {
-    // inx가 1일 때 src를 'w2x'로 설정
-    if (inx == 1) {
-        src = 'w2x'
-    // 그 외의 경우 src를 'cm'으로 설정
-    } else {
-        src = 'cm'
-    }
+    
+	// JS 파일 생성 단계
+	// 초기화 변수 src 설정
+	def src = ''
+	// genJsCnt 변수에 설정된 값만큼 반복 실행
+	for (int inx = 1; inx <= genJsCnt; inx++) {
+    	// inx가 1일 때 src를 'w2x'로 설정
+    	if (inx == 1) {
+        	src = 'w2x'
+	    // 그 외의 경우 src를 'cm'으로 설정
+	    } else {
+	        src = 'cm'
+	    }
+        
         stage('JS-' + inx + ' Generation') {
             try {
                 dir(workspace) {
-                    // wpack 옵션 설정
-	        // wpack 명령어 옵션 설정
-                    def wpack_option = ‘‘‘
-                    --baseDir ‘$workspace/src/main/resources/static’ 
+                	// wpack 옵션 설정
+	        		// wpack 명령어 옵션 설정
+                    def wpack_option = '''
+                    --baseDir '$workspace/src/main/resources/static' 
                     // 기본 디렉토리 설정
-                    --src ‘$workspace/src/main/resources/static/$src’ 
+                    --src '$workspace/src/main/resources/static/$src' 
                     // 소스 디렉토리 설정
-                    --dest ‘$workspace/src/main/resources/static/_wpack_’ 
+                    --dest '$workspace/src/main/resources/static/_wpack_' 
                     // 결과 저장 디렉토리 설정
-                    --js ‘$jsValue’ // JS 압축 여부 설정
-                    --css ‘$cssValue’ // CSS 압축 여부 설정
-                    --noDebug ‘false’ // 디버그 모드 비활성화 설정
-                    --noSourcemap ‘true’ // Sourcemap 비활성화 설정
-                    ‘‘‘                    def replacedString = wpack_option.replaceAll(‘\n’, ‘ ‘) // 옵션 문자열에서 줄바꿈 제거
+                    --js '$jsValue' // JS 압축 여부 설정
+                    --css '$cssValue' // CSS 압축 여부 설정
+                    --noDebug 'false' // 디버그 모드 비활성화 설정
+                    --noSourcemap 'true' // Sourcemap 비활성화 설정
+                    '''                    
+                    def replacedString = wpack_option.replaceAll('\n', ' ') // 옵션 문자열에서 줄바꿈 제거
                     // 2번째 JS 생성 시 추가 옵션
                     if (inx == 2) {
-                        replacedString += ‘‘‘ --ignore ‘$workspace/src/main/resources/static/cm/template’ ‘‘‘ 
+                        replacedString += ''' --ignore '$workspace/src/main/resources/static/cm/template' ''' 
                     }
                     // wpack 실행
                     dir('/data') {
@@ -118,8 +124,8 @@ for (int inx = 1; inx <= genJsCnt; inx++) {
     // Maven 빌드 단계
     stage('Maven Build') {
         try {
-            withEnv([‘MAVEN_HOME=${tool 'MAVEN_HOME'}’]) {
-                sh ‘${MAVEN_HOME}/bin/mvn clean install -X -Dmaven.test.skip=true -U’ // Maven 빌드 명령 실행
+            withEnv(['MAVEN_HOME=${tool 'MAVEN_HOME'}']) {
+                sh '${MAVEN_HOME}/bin/mvn clean install -X -Dmaven.test.skip=true -U' // Maven 빌드 명령 실행
             }
         } catch (err) {
             // 에러 발생 시 예외 던지기
@@ -127,21 +133,23 @@ for (int inx = 1; inx <= genJsCnt; inx++) {
             throw new Exception(err.getMessage()) 
         }
     }
-// WEB 서버 배포 및 백업 단계에 사용할 자격 증명 설정
-withCredentials([usernamePassword(credentialsId: 'webtob', passwordVariable: 'password', usernameVariable: 'userName')]) {
-    remote.name = 'webtob' // 원격 서버 이름 설정
-    remote.user = userName // 원격 서버 사용자 이름 설정
-    remote.password = password // 원격 서버 비밀번호 설정
-    def web_deploy_path = '/app/webtob/online/' + domainName + '/' + mwInsName 
-// 웹 배포 경로 설정
-    def static_file = pjtName + '-static.tgz' // 배포할 정적 파일 이름 설정
-    // 웹 서버 IP 리스트를 순회하며 배포 진행
-    for (int inx = 1; inx <= webIpList.size(); inx++) {
-        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
-        if (webIpList[inx - 1] == '' || webIpList[inx - 1].length() == 0) {
-            continue
-        }
-        remote.host = webIpList[inx - 1] // 현재 순번의 웹 서버 IP 주소 설정
+    
+	// WEB 서버 배포 및 백업 단계에 사용할 자격 증명 설정
+	withCredentials([usernamePassword(credentialsId: 'webtob', passwordVariable: 'password', usernameVariable: 'userName')]) {
+	    remote.name = 'webtob' // 원격 서버 이름 설정
+	    remote.user = userName // 원격 서버 사용자 이름 설정
+	    remote.password = password // 원격 서버 비밀번호 설정
+	    def web_deploy_path = '/app/webtob/online/' + domainName + '/' + mwInsName 
+		// 웹 배포 경로 설정
+	    def static_file = pjtName + '-static.tgz' // 배포할 정적 파일 이름 설정
+	    // 웹 서버 IP 리스트를 순회하며 배포 진행
+	    for (int inx = 1; inx <= webIpList.size(); inx++) {
+	        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
+	        if (webIpList[inx - 1] == '' || webIpList[inx - 1].length() == 0) {
+	            continue
+	        }
+       		remote.host = webIpList[inx - 1] // 현재 순번의 웹 서버 IP 주소 설정
+            
             // WEB 서버 배포 단계
             stage('WEB-' + inx + ' Deploy') {
                 try {
@@ -165,6 +173,7 @@ withCredentials([usernamePassword(credentialsId: 'webtob', passwordVariable: 'pa
                     throw new Exception(err.getMessage()) 
                 }
             }
+            
             // WEB 서버 백업 단계
             stage('WEB-' + inx + ' Backup') {
                 try {
@@ -189,25 +198,29 @@ withCredentials([usernamePassword(credentialsId: 'webtob', passwordVariable: 'pa
                     buildDescription '[Error Occurred(WEB Server Backup Failed) :: ' + err.getMessage() + ']' // 에러 발생 시 설명 추가
                     throw new Exception(err.getMessage()) 
                 }
+                
                 // 배포 경로에서 백업 파일 삭제
                 sshCommand remote: remote, command: '/usr/bin/rm -rf ' + web_deploy_path + '/' + static_file
             }
         }
     }
-// WAS 서버 배포 및 백업 단계에 사용할 자격 증명 설정
-withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'password', usernameVariable: 'userName')]) {
-    remote.name = 'jeus' // 원격 서버 이름 설정
-    remote.user = userName // 원격 서버 사용자 이름 설정
-    remote.password = password // 원격 서버 비밀번호 설정
-    def was_deploy_path = '/app/jeus/online/' + mwInsName // WAS 배포 경로 설정
-    def build_file = pjtName + '.war' // 배포할 빌드 파일 이름 설정
-    // WAS 서버 IP 리스트를 순회하며 배포 진행
-    for (int inx = 1; inx <= wasIpList.size(); inx++) {
-        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
-        if (wasIpList[inx - 1] == '' || wasIpList[inx - 1].length() == 0) {
-            continue
-        }
-        remote.host = wasIpList[inx - 1] // 현재 순번의 WAS 서버 IP 주소 설정
+    
+	// WAS 서버 배포 및 백업 단계에 사용할 자격 증명 설정
+	withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'password', usernameVariable: 'userName')]) {
+	    remote.name = 'jeus' // 원격 서버 이름 설정
+	    remote.user = userName // 원격 서버 사용자 이름 설정
+	    remote.password = password // 원격 서버 비밀번호 설정
+	    def was_deploy_path = '/app/jeus/online/' + mwInsName // WAS 배포 경로 설정
+	    def build_file = pjtName + '.war' // 배포할 빌드 파일 이름 설정
+	    // WAS 서버 IP 리스트를 순회하며 배포 진행
+	    for (int inx = 1; inx <= wasIpList.size(); inx++) {
+	        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
+	        if (wasIpList[inx - 1] == '' || wasIpList[inx - 1].length() == 0) {
+	            continue
+	        }
+	        
+        	remote.host = wasIpList[inx - 1] // 현재 순번의 WAS 서버 IP 주소 설정
+        	
             // WAS 서버 중지 단계
             stage('WAS-' + inx + ' Stop') {
                 try {
@@ -224,6 +237,7 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
                     throw new Exception(err.getMessage()) 
                 }
             }
+            
             // WAS 서버 배포 단계
             stage('WAS-' + inx + ' Deploy') {
                 try {
@@ -251,6 +265,7 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
                     throw new Exception(err.getMessage()) 
                 }
             }
+            
             // WAS 서버 시작 단계
             stage('WAS-' + inx + ' Start') {
                 try {
@@ -267,6 +282,7 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
                     throw new Exception(err.getMessage()) 
                 }
             }
+            
             // WAS 서버 백업 단계
             stage('WAS-' + inx + ' Backup') {
                 try {
@@ -294,6 +310,7 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
                 // 배포 경로에서 백업 파일 삭제
                 sshCommand remote: remote, command: '/usr/bin/rm -rf ' + was_deploy_path + '/' + build_file
             }
+            
             // WAS 서버 체크 단계
             stage('WAS-' + inx + ' Check') {
                 try {
@@ -313,20 +330,24 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
             }
         }
     }
-// 보고서 서버 배포 및 백업 단계에 사용할 자격 증명 설정
-withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'password', usernameVariable: 'userName')]) {
-    remote.name = 'jeus' // 원격 서버 이름 설정
-    remote.user = userName // 원격 서버 사용자 이름 설정
-    remote.password = password // 원격 서버 비밀번호 설정
-    def ozr_deploy_path = '/app/jeus/online/' + mwInsName + '/WEB-INF/repository_files' // ozR 배포 경로 설정
-    def ozr_file = pjtName + '-ozr.tgz' // 배포할 ozR 파일 이름 설정
-    // ozR 서버 IP 리스트를 순회하며 배포 진행
-    for (int inx = 1; inx <= ozIpList.size(); inx++) {
-        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
-        if (ozIpList[inx - 1] == '' || ozIpList[inx - 1].length() == 0) {
-            continue
-        }
-        remote.host = ozIpList[inx - 1] // 현재 순번의 ozR 서버 IP 주소 설정
+    
+	// 보고서 서버 배포 및 백업 단계에 사용할 자격 증명 설정
+	withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'password', usernameVariable: 'userName')]) {
+	    remote.name = 'jeus' // 원격 서버 이름 설정
+	    remote.user = userName // 원격 서버 사용자 이름 설정
+	    remote.password = password // 원격 서버 비밀번호 설정
+	    def ozr_deploy_path = '/app/jeus/online/' + mwInsName + '/WEB-INF/repository_files' // ozR 배포 경로 설정
+	    def ozr_file = pjtName + '-ozr.tgz' // 배포할 ozR 파일 이름 설정
+	    
+	    // ozR 서버 IP 리스트를 순회하며 배포 진행
+	    for (int inx = 1; inx <= ozIpList.size(); inx++) {
+	        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
+	        if (ozIpList[inx - 1] == '' || ozIpList[inx - 1].length() == 0) {
+	            continue
+	        }
+	        
+	        remote.host = ozIpList[inx - 1] // 현재 순번의 ozR 서버 IP 주소 설정
+            
             // 보고서 서버 배포 단계
             stage('RPT-' + inx + ' Deploy') {
                 try {
@@ -352,6 +373,7 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
             }
         }
     }
+    
     // 젠킨스 빌드 파일 정리 단계
     stage('Cleanup') {
         // 작업 공간의 임시 파일 삭제
@@ -359,6 +381,7 @@ withCredentials([usernamePassword(credentialsId: 'jeus', passwordVariable: 'pass
             deleteDir() // 임시 디렉토리 삭제
         }
     }
+    
     // 완료 단계
     stage('Complete') {
         echo 'Job Complete' // 작업 완료 메시지 출력
