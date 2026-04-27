@@ -18,3 +18,9 @@
     : http://<jenkins_url>/generic-webhook-trigger/invoke?token=<jenkins에 등록한 토큰>
   2-4. content type 입력
     : application/json
+    
+3. Jenkins - Gitbucket
+ 3-1. gitbucket에 jenkins 계정 생성
+ 3-2. jenkins에 username/password로 credential 생성
+ 3-3. SCM 연동 시, 3-2의 credential로 설정
+ 
