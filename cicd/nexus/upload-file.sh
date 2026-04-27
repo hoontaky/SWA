@@ -22,5 +22,5 @@ while read i; do
   curl -v -u $username:$password --upload-file $i "$nexus_url/$i"
 done < $work_path/upload-lib-list.out
 
-mv $work_path/upload-lib-list.out $backup-path}/upload-lib-list-$(date '+%y%m%d-%H5M').out
+mv $work_path/upload-lib-list.out $backup-path}/upload-lib-list-$(date '+%y%m%d-%H%M').out
 
