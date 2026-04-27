@@ -211,21 +211,21 @@ node {
     			try {
 			        // 로컬 빌드 경로 설정
 			        def build_path = workspace + '/target'
-			        dir(build_path)
-			        
-			        // 원격 서버에 배포할 경로 존재 여부 확인
-			        def wasDeployPathRes = sshCommand remote: remote, command: 'test -d ' + was_deploy_path + ' && echo 1 || echo 2'
-			        if (wasDeployPathRes == '2') {
-			            sshCommand remote: remote, command: 'mkdir -p ' + was_deploy_path
+			        dir(build_path) {
+				        // 원격 서버에 배포할 경로 존재 여부 확인
+				        def wasDeployPathRes = sshCommand remote: remote, command: 'test -d ' + was_deploy_path + ' && echo 1 || echo 2'
+				        if (wasDeployPathRes == '2') {
+				            sshCommand remote: remote, command: 'mkdir -p ' + was_deploy_path
+				        }
+				        // 빌드된 파일 중 첫 번째 *.jar 파일 선택
+				        def files = findFiles(glob: '**/*.jar')
+				        build_file = files[0].name
+				        
+				        // 원격 서버의 기존 파일 모두 삭제
+				        sshCommand remote: remote, command: '/usr/bin/rm -rf ' + was_deploy_path + '/*'
+				        // 선택한 빌드 파일을 원격 서버로 전송
+				        sshPut remote: remote, from: build_path + '/' + build_file, into: was_deploy_path
 			        }
-			        // 빌드된 파일 중 첫 번째 *.jar 파일 선택
-			        def files = findFiles(glob: '**/*.jar')
-			        build_file = files[0].name
-			        
-			        // 원격 서버의 기존 파일 모두 삭제
-			        sshCommand remote: remote, command: '/usr/bin/rm -rf ' + was_deploy_path + '/*'
-			        // 선택한 빌드 파일을 원격 서버로 전송
-			        sshPut remote: remote, from: build_path + '/' + build_file, into: was_deploy_path
 			    } catch (err) {
 			        // 예외 발생 시 에러 메시지 출력 후 예외 전파
 			        buildDescription '[Error Occurred(Batch Deploy Failed) :: ' + err.getMessage() + ']'
