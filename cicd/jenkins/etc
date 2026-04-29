@@ -2,3 +2,12 @@
 : 기존 환경의 plugins 폴더를 그대로 타 환경의 plugins 경로로 복사해도 그대로 작동 함 
 
 2. Jenkins URL 등록 시, localhost(127.0.0.1)은 안 좋음
+
+3. Groovy 참고
+ 3-1. sshCommand 사용 시에는 러턴 값을 받을 수 있음
+ : def file_count_str = sshCommand(remote: remote, command: 'ls ' + file_path + ' | wc -l')
+   def file_count = Integer.parseInt(file_count_str)
+   
+ 3-2. sh 사용 시에는 리턴 값을 받을 수 없음
+ : def file_count = sh(script: "ls $file_path | wc -l", returnStdout: true).trim().toInteger()
+ : def file_list = sh(script: "ls $file_path -t -r", returnStdout: true).trim().split("\n") as List // 역순으로 정렬하여 리스트 추출
