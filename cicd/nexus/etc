@@ -1,3 +1,7 @@
+# nexus 서비스 시작/종료
+: sh ..{NEXUS_HOME}/bin/nexus start
+: sh ..{NEXUS_HOME}/bin/nexus stop
+
 # 폐쇄망일 경우, anonymous access 허용 필요
 
 # library 이관
