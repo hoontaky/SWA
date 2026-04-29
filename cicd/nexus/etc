@@ -7,7 +7,7 @@
 # library 이관
 : 기존 환경의 repository 폴더를 그대로 타 환경의 repository 경로로 복사해도 그대로 작동 함
 
-# 권한 설정
+# 사용자/권한 설정
  1. Settings > Security > Roles 진입하여 신규 생성
  2. deploy 설정 시, 아래의 privileges 필요
   : nx-repository-view-maven2-*-add
