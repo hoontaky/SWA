@@ -14,6 +14,7 @@ tar -rf <tarFileName> <targetFileName>
 묶음/압축
 tar -cvzf <fileName> <path>
 : tar -cvzf test.tar.gz /app/sw/repository/
+: 동일 경로에서 진행 시, 마지막에 '|| true' 추가 필요
 
 묶음/압축 해지
 tar -xvzf <fileName>
