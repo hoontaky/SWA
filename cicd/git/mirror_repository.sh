@@ -30,7 +30,9 @@ withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'p
 
 withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'password', usernameVariable: 'userName')]) {
 	dir('./common.git') {
-		git remote add target http://root@127.0.0.1:9090/com/common.git
-		git push target --mirror
+		sh """
+			git remote add target http://root@127.0.0.1:9090/com/common.git
+			git push target --mirror
+		"""
 	}
 }
