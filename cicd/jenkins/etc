@@ -12,5 +12,5 @@
  : def file_count = sh(script: "ls $file_path | wc -l", returnStdout: true).trim().toInteger()
  : def file_list = sh(script: "ls $file_path -t -r", returnStdout: true).trim().split("\n") as List // 역순으로 정렬하여 리스트 추출
  
-4. groovy 스크립트로 job 작성 중, 특정 조건에서 job을 중지하고 싶은때는 return을 적용
-   단, stage 밖에서 returun을 적용해야 전체 job이 중지 됨
+ 3-3. groovy 스크립트로 job 작성 중, 특정 조건에서 job을 중지하고 싶은때는 return을 적용
+      단, stage 밖에서 returun을 적용해야 전체 job이 중지 됨
