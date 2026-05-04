@@ -1,0 +1,31 @@
+# Linux Service 관련 정보
+1. 위치
+: /etc/systemd/system/{service_name}.service
+ ex) jenkins.service
+
+2. file(jenkins 예시)
+[Unit]
+Description=Jenkins Service
+After=network.target
+
+[Service]
+Type=simple
+User=cicdadm
+Group=5001
+WorkingDirectory=/app/cicd/jenkins/app
+Environment="JENKINS_HOME=/app/cicd/jenkins/data"
+Environment="JAVA_HOME=/usr/lib/jvm/java-21-openjdk-21.0.6.0.7-2.el9.x86_64"
+Environment="PATH=/usr/lib/jvm/java-21-openjdk-21.0.6.0.7-2.el9.x86_64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+ExecStart=/usr/lib/jvm/java-21-openjdk-21.0.6.0.7-2.el9.x86_64/bin/java -DJENKINS_HOME=/app/cicd/jenkins/data -jar /app/cicd/jenkins/app/jenkins.war --httpPort=8085
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
+
+3. Start/Stop
+: systemctl start {service_name}
+ ex) systemctl start jenkins
+: systemctl stop {service_name}
+ ex) systemctl stop jenkins
