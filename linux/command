@@ -32,6 +32,9 @@ shell 파일 실행 시, true 붙여주는 것이 좋음
 du --max-depth 1 -h(k/m도 가능)
 : du --max-depth 1 -h /data
 
+# 하위 경로 용량 확인
+du -sh *
+
 # 업로드 경로 찾을 때(Unix)
 du -k | perl -ne 'prin if (tr#/#/# ==1)'
 
