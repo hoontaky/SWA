@@ -1,0 +1,11 @@
+1. git 경로 진입
+ : cd <git repository folder>
+
+2. git 상태 확인(정상 여부 확인)
+ : git status
+
+3. git 복원
+ : git restore .
+
+4. git checkout
+ : git checkout -- . 
