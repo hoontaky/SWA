@@ -29,6 +29,9 @@ withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'p
 }
 
 withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'password', usernameVariable: 'userName')]) {
+	
+	// for 사용 시에는 "target" 사용하면 오류 발생함. git은 저장소 명을 하나만 사용 가능함. >> for 문 key 값 사용 권장
+	
 	dir('./common.git') {
 		sh """
 			git remote add target http://root@127.0.0.1:9090/com/common.git
