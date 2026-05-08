@@ -1,2 +1,8 @@
 # 네트워크 연결 열기
 win + r > ncpa.cpl 입력
+
+# 화면 잠그기 bat 파일(아래 내용 그대로 붙여넣기)
+bat
+
+@echo off
+rundll32.exe user32.dll, LockWorkStation
