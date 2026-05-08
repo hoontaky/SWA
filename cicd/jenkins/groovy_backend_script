@@ -374,6 +374,21 @@ node {
         }
     }
     
+    // 다른 JOB 호출
+    stage('Call Another Job') {
+    	def response = build(
+    		job: 'another-job',
+    		wait: true, // true이면 동기식 / false이면 비동기식
+    		propagate: false // true이면 another-job의 결과에 영향을 받음 / false이면 another-job의 결과에 영향을 받지 않음
+    	)
+    	
+    	if (response.result == 'SUCCESS') {
+    		echo ">>>> Another Job Success!!!"
+    	} else {
+    		echo ">>>> Another Job Failed!!!"
+    	}
+    }
+    
     // 젠킨스 빌드 파일 정리 단계
     stage('Cleanup') {
         // 작업 공간의 임시 파일 삭제
