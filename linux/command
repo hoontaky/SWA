@@ -88,3 +88,10 @@ top -bn1 | grep "Cpu(s)" | awk '{print("CPU Usage : %.1f%%\n", 100-$8)}'
 #jstat 사용법
 jstat -gcutil -h 20 ${PID} 2000 >> 상위 20개만 XX 2초 간격으로 %로 표출
 jstat -gc -h 20 ${PID} 2000 >>    상위 20개만 XX 2초 간격으로 숫차로 표출
+
+# find
+경로에서 동일한 확장자의 파일을 찾아서 특정 파일을 제외한 나머지 검색
+find <path> -type f -name 'application-*.yml' ! -name 'application-dev.yml'
+
+경로에서 동일한 확장자의 파일을 찾아서 특정 파일을 제외한 나머지는 삭제
+find <path> -type f -name 'application-*.yml' ! -name 'application-dev.yml' -delete
