@@ -1,0 +1,20 @@
+import groovy.json.JsonSlurperClassic
+
+node {
+	def health = ''
+	
+	for(int inx=0; inx<3; inx++) {
+		def response = sshCommand(remote: remote, command: 'curl http://localhost:11100/health')
+		health = new JsonSlurperClassic().parseText(healthJson)
+		
+		if("${health.status}" != 'UP') {
+			sleep 5
+			
+			continue
+		}
+	}
+	
+	if("${health.status}" != 'UP') {
+		throw new Exception('Application Failed to Start!!!')
+	}
+}
