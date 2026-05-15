@@ -2,7 +2,8 @@
 : sh ..{NEXUS_HOME}/bin/nexus start
 : sh ..{NEXUS_HOME}/bin/nexus stop
 
-# 폐쇄망일 경우, anonymous access 허용 필요
+# account에 maven/config/settings.xml의 계정 정보가 등록되어져야 함.
+ >> 해당 정보 미 등록 시, anonymous 허용 필요
 
 # library 이관
 : 기존 환경의 repository 폴더를 그대로 타 환경의 repository 경로로 복사해도 그대로 작동 함
