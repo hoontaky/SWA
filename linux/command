@@ -95,3 +95,7 @@ find <path> -type f -name 'application-*.yml' ! -name 'application-dev.yml'
 
 경로에서 동일한 확장자의 파일을 찾아서 특정 파일을 제외한 나머지는 삭제
 find <path> -type f -name 'application-*.yml' ! -name 'application-dev.yml' -delete
+
+경로에서 하위 첫 번째 폴더 명만 조회(베이스 경로인 ./ 제외)
+find <path> -maxdepth 1 ! -name .
+find <path> -maxdepth 1 ! -name . | cut -c 3-
