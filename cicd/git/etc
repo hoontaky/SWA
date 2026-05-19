@@ -1,3 +1,0 @@
-# git commit 취소
-git reset HEAD~<취소count>
-: git reset HEAD~1 >> 직전 커밋 취소
