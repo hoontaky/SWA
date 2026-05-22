@@ -106,6 +106,15 @@ node {
                     def replacedString = wpack_option.replaceAll('\n', ' ') // 옵션 문자열에서 줄바꿈 제거
                     // 2번째 JS 생성 시 추가 옵션
                     if (inx == 2) {
+                    	def rawFiles = sh(script: "find $workspace/src/main/resources/static/$src/js -type f -name '*.js'", returnStdout: true).trim().split('\n')
+                    	def jsFiles = []
+                    	rawFiles.each() { file ->
+                    		jsFiles.add(file.replace("$workspace/src/main/resources/static", ""))
+                    	}
+                    	
+                    	def dynamicCommonPath = jsFiles.join(',')
+                    	
+                    	replacedString += """ --common "true" --scopeCommon "com" --commonPath "${dynamicCommonPath}" """
                         replacedString += ''' --ignore '$workspace/src/main/resources/static/cm/template' ''' 
                     }
                     // wpack 실행
