@@ -1,0 +1,26 @@
+import groovy.json.JsonSlurperClassic
+
+node {
+	def repo = ''
+	def ipList = ['192.168.0.0.1', '192.168.0.0.2', '192.168.0.0.3']
+	for(int inx=0; inx<repoList.size(); inx++) {
+		repo = repoList[inx]
+		
+		withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'password', usernameVariable: 'userName')]) {
+			dir("${workspace}/${repo}.git") {
+				def ip = ''
+				def targetUrl = ''
+				
+				for(int jnx=0; jnx<ipList.size(); jnx++) {
+					ip = ipList[jnx]
+					targetUrl = "http://${userName}:${password}@${ip}:8080/git/group/${repo}.git"
+					
+					sh """
+						git remote add ${ip} ${targetUrl}
+						git push ${ip} --mirror
+					"""
+				}
+			}
+		}
+	}
+}
