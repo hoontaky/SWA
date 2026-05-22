@@ -133,7 +133,11 @@ node {
     // Maven 빌드 단계
     stage('Maven Build') {
         try {
-            withEnv(['MAVEN_HOME=${tool 'MAVEN_HOME'}']) {
+        	// tool 'MAVEN_HOME'의 의미는 jenkins management > tool에 등록된 maven_home 이름
+        	// tool 'openjdk-17'의 의미는 jenkins management > tool에 등록된 java_home 이름이며, 서버의 java 버전과 빌드할 java 버전이 다를 경우 사용
+            withEnv(['MAVEN_HOME=${tool 'MAVEN_HOME'}',
+            		 "JAVA_HOME=${tool 'openjdk-17'}"
+            ]) {
                 sh '${MAVEN_HOME}/bin/mvn clean install -X -Dmaven.test.skip=true -U' // Maven 빌드 명령 실행
             }
         } catch (err) {
