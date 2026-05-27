@@ -28,6 +28,9 @@ tar -xvzf <fileName> -C /path
 shell 파일 실행 시, true 붙여주는 것이 좋음
 : sh ./start.sh || true
 
+shell 파일 실행 시, 세션이 계속 물고 있을 경우
+: sh ./start.sh > /dev/null 2 > &1 &
+
 # 업로드 경로 찾을 때(Linux)
 du --max-depth 1 -h(k/m도 가능)
 : du --max-depth 1 -h /data
