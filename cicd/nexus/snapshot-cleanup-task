@@ -1,0 +1,7 @@
+스냅샷(Snapshot)의 경우: Maven 전용 Task 사용
+만약 대상 라이브러리가 Maven 포맷의 SNAPSHOT 버전이라면 별도의 정책 없이 기본 Task로 개수 제한이 가능합니다.
+- Administration > System > Tasks > Create Task 이동
+- 유형 중 Maven - Delete unused SNAPSHOT 또는 Maven - Remove snapshots from repository 선택
+- Minimum snapshot count에 유지할 파일 수 입력
+- Snapshot retention(days)는 몇 일 이 후부터 "Minimum snapshot count"를 할 것이냐의 값을 입력
+: 1로 적용하면 1일이 지난 라이브러리 중 "Minimum snapshot count" 만큼만 남기고 삭제 
