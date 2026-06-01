@@ -1,0 +1,8 @@
+Initial Settings
+- repository
+: nexus 연동 경로
+- apache maven
+: /conf/settins.xml에 local repository 경로 설정
+- jdk
+
+위의 폴더를 eclipse와 묶어서 하나로 배포
