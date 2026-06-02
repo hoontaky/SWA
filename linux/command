@@ -16,6 +16,10 @@ tar -cvzf <fileName> <path>
 : tar -cvzf test.tar.gz /app/sw/repository/
 : 동일 경로에서 진행 시, 마지막에 '|| true' 추가 필요
 
+특정 경로 묶음/압축
+(/sw/app 경로 아래의 a1, a2, a3 경로가 존재함. /sw/ 경로에서 app 없이 바로 a1, a2, a3 를 tar.gz 파일로 묶는 방법)
+cd /sw && tar -czvf app.tar.gz -C app .
+
 묶음/압축 해지
 tar -xvzf <fileName>
 : tar -xvzf test.tar.gz
