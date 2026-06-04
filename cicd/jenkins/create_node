@@ -1,0 +1,50 @@
+#node 추가 하기
+- Name
+: 화면에서 출력되는 node 명
+
+- Number of executors
+: 해당 node에서 실행하는 한 job 수
+: master node의 executors 수와는 연관 관계 없음
+
+- Remote root directory
+: Jenkins Home 경로(ex> /sw/app/jenkins)
+
+- Lable
+: 스크립에서 node를 바라보는 node 라벨
+: 반드시 label의 명과 스크립트에서 사용하는 node의 명이 일치해야 함
+
+- Launch Method
+: Launch agents via SSH 적용
+  > Host: http(s) 없이 IP 혹은 도메인 적용(ex> 192.0.0.1)
+  > Credentials: 서버 접근이 가능한 Jenkins credentials에 등록된 계정
+  > Host Key verification strategy: Non verifying Verification Strategy 선택
+  > 서버 접근 SSH 포트가 일반적으로 '22'가 아닐 경우, '고급' 클릭 후에 Port 값 입력
+
+#node의 exeucutors 수는 서버의 core 수와 1:1이 적당 함
+
+#customizing node를 추가할 경우, master node(Built-in Node)의 executors 수는 '0'으로 변경하는 것이 권장 사항임.
+
+#만일 세컨더리 node로 'non-prod'/'prod'를 추가했을 경우,
+
+1) 스크립트 적용 방안 #1
+node('non-prod') {
+  stage('start') {
+    ...
+  }
+}
+
+2) 스크립트 적용 방안 #2
+node {
+  def targetNode = ''
+  if(env.JOB_NAME == 'dev') {
+    targetNode = 'non-prod'
+  } else {
+    targetNode = 'prod'
+  }
+  
+  node(targetNode) {
+    stage('start') {
+      ...
+    }
+  }
+}
