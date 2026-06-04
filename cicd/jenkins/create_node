@@ -16,7 +16,7 @@
 - Launch Method
 : Launch agents via SSH 적용
   > Host: http(s) 없이 IP 혹은 도메인 적용(ex> 192.0.0.1)
-  > Credentials: 서버 접근이 가능한 Jenkins credentials에 등록된 계정
+  > Credentials: 서버 접근이 가능한 Jenkins credentials에 등록된 계정(해당 계정으로 파일 사용하므로, root는 피하는 것을 권고 함.)
   > Host Key verification strategy: Non verifying Verification Strategy 선택
   > 서버 접근 SSH 포트가 일반적으로 '22'가 아닐 경우, '고급' 클릭 후에 Port 값 입력
 
