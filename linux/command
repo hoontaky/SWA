@@ -110,3 +110,17 @@ find <path> -type d -name 'application-*' ! -name 'application-dev' -exec rm -rf
 경로에서 하위 첫 번째 폴더 명만 조회(베이스 경로인 ./ 제외)
 find <path> -maxdepth 1 ! -name .
 find <path> -maxdepth 1 ! -name . | cut -c 3-
+
+# vi
+라인 넘버 켜기
+:set number / :set nu
+라인 넘버 끄기
+:set nonumber / :set nonu
+첫 줄로 이동
+gg
+Visual Mode
+V
+마지막 줄로 이동
+G
+전체 선택 및 삭제
+gg -> V -> G -> d
