@@ -1,0 +1,6 @@
+# Jenkins 환경 변수 등록 방법
+1. Jenkins > Manage > System 접속
+2. Global properties 메뉴에서 "Environment variables" 체크 박스를 활성화
+3. 이름에 Key, 값에 Value 입력
+
+사용법은 etc 파일의 3.4 참조
