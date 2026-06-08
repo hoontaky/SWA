@@ -14,3 +14,7 @@
  
  3-3. groovy 스크립트로 job 작성 중, 특정 조건에서 job을 중지하고 싶은때는 return을 적용
       단, stage 밖에서 returun을 적용해야 전체 job이 중지 됨(stage 안에서 return 적용 시, 해당 stage만 중지 됨. 다음 stage로 이어짐)
+
+ 3-4. grooby 스크립트에서 환경 변수 사용
+ : 직접적으로 환경 변수 사용 시에는 env.GIT_IP
+ : 파리머터 처리해서 환경 변수 사용 시에는 env[gitIp]
