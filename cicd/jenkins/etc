@@ -7,6 +7,7 @@
  3-1. sshCommand 사용 시에는 러턴 값을 받을 수 있음
  : def file_count_str = sshCommand(remote: remote, command: 'ls ' + file_path + ' | wc -l')
    def file_count = Integer.parseInt(file_count_str)
+ : def result = sshCommand remote: remote, command: "test -d ${deployPath} && echo 1 || echo 2"
    
  3-2. sh 사용 시에는 리턴 값을 받을 수 없음
  : def file_count = sh(script: "ls $file_path | wc -l", returnStdout: true).trim().toInteger()
