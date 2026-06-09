@@ -1,3 +1,5 @@
+// Tomcat의 Health Check가 가능한 Valve를 호출하는 스크립트
+
 import groovy.json.JsonSlurperClassic
 
 node {

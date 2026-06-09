@@ -1,4 +1,4 @@
-import groovy.json.JsonSlurperClassic
+// 다른 IP의 git으로 소스를 mirror 처리하는 스크립트
 
 node {
 	def repo = ''
@@ -16,7 +16,7 @@ node {
 					targetUrl = "http://${userName}:${password}@${ip}:8080/git/group/${repo}.git"
 					
 					sh """
-						git remote add ${ip} ${targetUrl}
+						git remote add ${ip} ${targetUrl} // ${ip}는 unique 값을 만들기 위한 변수 임.
 						git push ${ip} --mirror
 					"""
 				}
