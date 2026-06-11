@@ -7,7 +7,7 @@
 : master node의 executors 수와는 연관 관계 없음
 
 - Remote root directory
-: Jenkins Home 경로(ex> /sw/app/jenkins)
+: Jenkins Home 경로(Jenkins Root 경로와 일치시킴 >> 해당 경로에 workspace가 생김 / ex> /sw/app/jenkins)
 
 - Lable
 : 스크립에서 node를 바라보는 node 라벨
