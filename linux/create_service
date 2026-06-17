@@ -1,0 +1,30 @@
+# Linux Service 등록
+1. 서비스 파일 생성(복사 및 수정)
+===== 예시 =====
+[Unit]
+Description=Gitbucket Service
+After=network.target
+
+[Service]
+Type=simple
+User=cicdadm
+Group=5001
+WorkingDirectory=/app/cicid/gitbucket/app
+ExecStart=/usr/bin/java -jar /app/cicd/gitbucket/app/gitbucket.war --host=0.0.0 --port=8084 --gitbucket.home=/app/cicd/gitbucket/data
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
+
+2. systemd 데몬 재로드 (새 파일 인식)
+# Daemon Reload
+sudo systemctl daemon-reload
+
+3. 서비스 활성화 및 시작
+# 부팅 시 자동 시작 설정
+sudo systemctl enable application2.service
+
+# 서비스 즉시 시작
+sudo systemctl start application2.service
