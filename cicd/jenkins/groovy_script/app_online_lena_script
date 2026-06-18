@@ -57,10 +57,11 @@ node {
     // GitLab 브랜치 설정(git 경로와 jobName을 맞추면 모두 변수 처리 가능)
     def appGitBranch = "${envName}"
     
-    // WEB 서버 IP 리스트
-    def webIpList = ['192.168.56.1', '192.168.56.2']
-    // WAS 서버 IP 리스트
-    def wasIpList = ['192.168.57.1', '192.168.57.2', '192.168.57.3', '192.168.57.4']
+    // Number of WAS
+    def wasCount = 1
+    if(envName == "prd") {
+    	wasCount = 2
+    }
     // WAS Server Path
     def wasServerPath = "/app/lena/AppServer/servers/${grpName}App"
     // WAS Health Check Retry Count
@@ -293,15 +294,23 @@ node {
 	    def was_deploy_path = "/dest/${pjtName}/back-end"
 	    // 배포할 빌드 파일 이름 설정
 	    def build_file = "${pjtName}.war"
+	    
 	    // WAS 서버 IP 리스트를 순회하며 배포 진행
-	    for (int inx = 1; inx <= wasIpList.size(); inx++) {
+	    def wasIp = ""
+	    def wasIpParam = ""
+	    for (int inx = 1; inx < (wasCount + 1)); inx++) {
+	        // WAS IP 설정
+	        // Jenkins System 변수에 "환경명_기관명_WAS_Index"가 설정되어져 있어야 함.(ex> DEV_KNP_WAS_1)
+	        wasIpParam = "${env.Name.toUpperCase()}_${grpName.toUpperCase()}_WAS_${inx}"
+	        wasIp = env[wasIpParam]
+	        
 	        // IP 주소가 비어있는지 확인하고 비어있으면 건너뜀
-	        if (wasIpList[inx - 1] == '' || wasIpList[inx - 1].length() == 0) {
-	            continue
+	        if (wasIp == "" || wasIp.length() == 0) {
+	        	continue
 	        }
 	        
 	        // 현재 순번의 WAS 서버 IP 주소 설정
-        	remote.host = wasIpList[inx - 1]
+        	remote.host = wasIp
         	
             // WAS 서버 중지 단계
             stage("WAS-${inx} Stop") {
