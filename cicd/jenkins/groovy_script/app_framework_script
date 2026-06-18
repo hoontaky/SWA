@@ -53,7 +53,7 @@ node {
         cleanWs()
     }
 
-     stage('Gitlab Checkout') {
+     stage('Git Checkout') {
 	    try {
 	        // 워크스페이스 정리: 작업 공간의 임시 파일 및 이전 빌드 데이터를 정리합니다.
 	        step([$class: 'WsCleanup'])
@@ -82,7 +82,7 @@ node {
 	        ])
 	    } catch (err) {
 	        // Git 체크아웃 실패 시 에러 메시지 출력
-	        buildDescription '[Error Occurred(Git Checkout Failed) :: ' + err.getMessage() + ']'
+	        buildDescription "[Error Occurred(Git Checkout Failed) :: ${err.getMessage()}]"
 	        // 예외 발생 시 예외 메시지를 포함하여 새로운 예외를 발생시킴
 	        throw new Exception(err.getMessage())
 	    }
@@ -103,7 +103,7 @@ node {
 	    } catch (err) {
 	        // Maven 빌드 실패 시 에러 메시지 출력
 	        // buildDescription으로 빌드 설명을 업데이트
-	        buildDescription '[Error Occurred(Maven Build Failed) :: ' + err.getMessage() + ']'
+	        buildDescription "[Error Occurred(Maven Build Failed) :: ${err.getMessage()}]"
 	        // 예외를 발생시켜 빌드 실패로 표시
 	        throw new Exception(err.getMessage())
 	    }
@@ -111,7 +111,7 @@ node {
 	
     stage('Cleanup') {
         // 임시 워크스페이스 디렉토리 정리
-        dir('${env.WORKSPACE}@tmp') {
+        dir("${env.WORKSPACE}@tmp") {
             deleteDir()
         }
     }
