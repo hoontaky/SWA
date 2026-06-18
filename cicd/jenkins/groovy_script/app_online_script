@@ -409,7 +409,7 @@ node {
             stage("WAS-${inx} Check") {
                 try {
                     // WAS 서버 프로세스 확인
-                    def pid = sshCommand remote: remote, command: "ps -ef | grep java | grep ${pjtName} | awk '{print $2}'"
+                    def pid = sshCommand remote: remote, command: "ps -ef | grep java | grep ${pjtName} | awk \'{print $2}\'"
                     echo "WAS-${inx} Check :: [${pid}]"
                      
                     // 프로세스 ID 출력
