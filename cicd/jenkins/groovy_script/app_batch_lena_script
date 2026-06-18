@@ -62,7 +62,7 @@ node {
     // WAS 서버 IP 리스트
     def wasIpList = ['192.168.57.1', '192.168.57.2', '192.168.57.3', '192.168.57.4']
     // WAS Server Path
-    def wasServerPath = "/app/lena/AppServer/servers/${grpName}App"
+    def wasServerPath = "/app/lena/AppServer/servers/${grpName}Bat"
     // WAS Health Check Retry Count
     def wasCheckCount = 5
     
