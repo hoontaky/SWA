@@ -2,7 +2,7 @@
 def removeBackupData(file_path, keep_count) {
     // file_path 경로의 파일 개수 확인
     def file_count_str = sh (
-        script: 'ls $file_path | wc -l',
+        script: "ls ${file_path} | wc -l",
         returnStdout: true
     ).trim()
     // 파일 개수를 정수형으로 변환
@@ -12,7 +12,7 @@ def removeBackupData(file_path, keep_count) {
         // 오래된 파일 목록을 시간 순서로 정렬하여 가져옴
         def files = sh (
         // 파일 목록을 시간 역순(-t) 및 역순(-r)으로 정렬하여 쉘 명령어로 가져옴
-            script: 'ls $file_path -t -r',
+            script: "ls ${file_path} -t -r",
             // 쉘 명령어의 출력 결과를 문자열로 반환
             returnStdout: true
         )
@@ -25,9 +25,9 @@ def removeBackupData(file_path, keep_count) {
             // 삭제할 파일 이름을 리스트에서 가져옴
             file_name = file_list[inx].trim()
             // 삭제할 파일 이름을 로그로 출력
-            echo 'removed file name : [$file_name]'
+            echo "removed file name : [${file_name}]"
             // 파일 삭제 명령어 실행
-            sh '/usr/bin/rm -rf $file_path/$file_name'
+            sh "/usr/bin/rm -rf ${file_path}/${file_name}"
         }
 	}
 }
