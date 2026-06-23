@@ -144,15 +144,15 @@ node {
 	        		// wpack 명령어 옵션 설정
                     def wpack_option = """
                     // 기본 디렉토리 설정
-                    --baseDir "$workspace/src/main/resources/static" 
+                    --baseDir "${workspace}/src/main/resources/static" 
                     // 소스 디렉토리 설정
-                    --src "$workspace/src/main/resources/static/$src" 
+                    --src "${workspace}/src/main/resources/static/${src}" 
                     // 결과 저장 디렉토리 설정
-                    --dest "$workspace/src/main/resources/static/_wpack_" 
+                    --dest "${workspace}/src/main/resources/static/_wpack_" 
                     // JS 압축 여부 설정
-                    --js "$jsValue"
+                    --js "${jsValue}"
                     // CSS 압축 여부 설정
-                    --css "$cssValue"
+                    --css "${cssValue}"
                     // 디버그 모드 비활성화 설정
                     --noDebug "false"
                     // Sourcemap 비활성화 설정
@@ -169,10 +169,10 @@ node {
                     
                     // 2번째 JS 생성 시 추가 옵션
                     if (inx == 2) {
-                    	def rawFiles = sh(script: "find $workspace/src/main/resources/static/$src/js -type f -name '*.js'", returnStdout: true).trim().split('\n')
+                    	def rawFiles = sh(script: "find ${workspace}/src/main/resources/static/$src/js -type f -name '*.js'", returnStdout: true).trim().split('\n')
                     	def jsFiles = []
                     	rawFiles.each() { file ->
-                    		jsFiles.add(file.replace("$workspace/src/main/resources/static", ""))
+                    		jsFiles.add(file.replace("${workspace}/src/main/resources/static", ""))
                     	}
                     	
                     	def dynamicCommonPath = jsFiles.join(',')
