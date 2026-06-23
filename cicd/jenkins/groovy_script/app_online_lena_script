@@ -66,6 +66,8 @@ node {
     def wasServerPath = "/app/lena/AppServer/servers/${grpName}App"
     // WAS Health Check Retry Count
     def wasCheckCount = 5
+    // WAS Port(for Checking Health)
+    def wasPort = 11100
     
     // Websquare Build Options
     // 0: minify
@@ -424,7 +426,7 @@ node {
                     for(int jnx=0; jnx<wasCheckCount; jnx++) {
                     	sleep 5
                     	try {
-                    		healthJson = sshCommand(remote: remote, command: "curl http://localhost:11100/health")
+                    		healthJson = sshCommand(remote: remote, command: "curl http://localhost:${wasPort}/health")
                     	} catch (err) {
                     		echo "[Error Occurred(WAS Check SSH Connection Failed) :: ${err.getMessage()}]"
                     		continue
