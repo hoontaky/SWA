@@ -162,6 +162,11 @@ node {
                     // 옵션 문자열에서 줄바꿈 제거
                     def replacedString = wpack_option.replaceAll('\n', ' ')
                     
+                    // (wpack 버전이 최신일 경우 가능)w2x 빌드 시 추가 옵션: $p 생성
+                    if (inx == 1) {
+                    	replacedString += """ --config "${workspace}/src/main/resources/static/websquare/config.js" """
+                    }
+                    
                     // 2번째 JS 생성 시 추가 옵션
                     if (inx == 2) {
                     	def rawFiles = sh(script: "find $workspace/src/main/resources/static/$src/js -type f -name '*.js'", returnStdout: true).trim().split('\n')
@@ -173,11 +178,13 @@ node {
                     	def dynamicCommonPath = jsFiles.join(',')
                     	
                     	replacedString += """ --common "true" --scopeCommon "com" --commonPath "${dynamicCommonPath}" """
-                        replacedString += ''' --ignore '$workspace/src/main/resources/static/cm/template' ''' 
+                        replacedString += """ --ignore "${workspace}/src/main/resources/static/cm/template" """ 
                     }
                     
+                    echo "Websqure Build Option :: ${replacedString}"
+                    
                     // wpack 실행
-                    sh './standalone_wpack-linux ' + replacedString 
+                    sh "./standalone_wpack-linux ${replacedString}"
                 }
             } catch (err) {
                 // 에러 발생 시 설명 추가
