@@ -68,6 +68,14 @@ node {
     def wasCheckCount = 5
     // WAS Port(for Checking Health)
     def wasPort = 11100
+    // WEB Deploy Path
+    def web_deploy_path = "/app/${pjtName}/front-end"
+    // WEB Backup Path
+    def v_web_backup_path = "/backup/${pjtName}/front-end"
+	// WAS Deploy Path
+	def was_deploy_path = "/dest/${pjtName}/back-end"
+    // WAS Backup Path
+    def v_was_backup_path = "/backup/${pjtName}/back-end"
     
     // Websquare Build Options
     // 0: minify
@@ -168,7 +176,7 @@ node {
                     
                     // cm(js파일) 빌드 시 추가 옵션
                     if (inx == 2) {
-                    	def rawFiles = sh(script: "find ${workspace}/src/main/resources/static/$src/js -type f -name '*.js'", returnStdout: true).trim().split('\n')
+                    	def rawFiles = sh(script: "find ${workspace}/src/main/resources/static/${src}/js -type f -name '*.js'", returnStdout: true).trim().split('\n')
                     	def jsFiles = []
                     	rawFiles.each() { file ->
                     		jsFiles.add(file.replace("${workspace}/src/main/resources/static", ""))
@@ -220,7 +228,6 @@ node {
 	    remote.user = userName
 	    // 원격 서버 비밀번호 설정
 	    remote.password = password
-	    def web_deploy_path = "/app/${pjtName}/front-end" 
 		// 웹 배포 경로 설정
 		// 배포할 정적 파일 이름 설정
 	    def static_file = "${pjtName}-static.tgz"
@@ -265,8 +272,6 @@ node {
                     now = new Date()
                     currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul'))
                     def backFile = "${currentDate}-${static_file}" 
-                    // 백업 경로 설정
-                    def v_web_backup_path = "/backup/${pjtName}/front-end"
                     // 백업 경로가 존재하는지 확인
                     def webBackupPathRes = sshCommand remote: remote, command: "test -d ${v_web_backup_path} && echo 1 || echo 2"
                     // 경로가 없으면 생성
@@ -298,9 +303,6 @@ node {
 	    remote.user = userName
 	    // 원격 서버 비밀번호 설정
 	    remote.password = password
-	    
-	    // WAS 배포 경로 설정
-	    def was_deploy_path = "/dest/${pjtName}/back-end"
 	    // 배포할 빌드 파일 이름 설정
 	    def build_file = "${pjtName}.war"
 	    
@@ -394,8 +396,6 @@ node {
                     now = new Date()
                     currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul'))
                     def backFile = "${currentDate}-${build_file}"
-                    // 백업 경로 설정
-                    def v_was_backup_path = "/backup/${pjtName}/back-end"
                     // 백업 경로가 존재하는지 확인
                     def wasBackupPathRes = sshCommand remote: remote, command: "test -d ${v_was_backup_path} && echo 1 || echo 2"
                     // 경로가 없으면 생성
