@@ -25,16 +25,11 @@ def removeBackupData(remote, file_path, keep_count) {
 
 // 젠킨스 파이프라인 시작
 node {
+	/**
+	 * Global Parameter
+	 */
 	// 현재 작업 디렉토리
     def workspace = pwd()
-    
-    // 원격 서버 설정을 위한 맵
-    def remote = [:]
-    // SSH 포트 설정
-    remote.port = 20022
-    // 모든 호스트 허용 설정
-    remote.allowAnyHosts = true
-    
     // 현재 시간 변수
     def now = ''
     // 현재 날짜 변수
@@ -46,17 +41,33 @@ node {
     // 기관 이름 추출
     def grpName = jobName.split('-')[1]
     // 프로젝트 이름 추출
-    def pjtName = jobName.split('-')[2]
+    def pjtName = jobName.split('-')[2
     
-    // GitLab URL 설정
+	/**
+	 * SSH Info.
+	 */
+    // 원격 서버 설정을 위한 맵
+    def remote = [:]
+    // SSH 포트 설정
+    remote.port = 20022
+    // 모든 호스트 허용 설정
+    remote.allowAnyHosts = true
+    
+	/**
+	 * Git Info.
+	 */
+    // Git URL 설정
     def gitIpParam = "${grpName.toUpperCase()}_GIP_IP"
     def appGitIp = env[gitIpParam]
     def appGitUrl = "http://${appGitIp}:40100"
-    // GitLab Repository 경로(git 경로와 jobName을 맞추면 모두 변수 처리 가능)
+    // Git Repository 경로(git 경로와 jobName을 맞추면 모두 변수 처리 가능)
     def appRepo = "/${grpName}/${pjtName}.git"
-    // GitLab 브랜치 설정(git 경로와 jobName을 맞추면 모두 변수 처리 가능)
+    // Git 브랜치 설정(git 경로와 jobName을 맞추면 모두 변수 처리 가능)
     def appGitBranch = "${envName}"
     
+	/**
+	 * M/W Info.
+	 */
     // Number of WAS
     def wasCount = 1
     if(envName == "prd") {
@@ -77,7 +88,9 @@ node {
     // WAS Backup Path
     def v_was_backup_path = "/backup/${pjtName}/back-end"
     
-    // Websquare Build Options
+	/**
+	 * Websquare Build Options
+	 */
     // 0: minify
     // 1: 주석 공백 제거
     // 2: 주석, 고백제거, 로컬 변수 치환
@@ -89,9 +102,15 @@ node {
     // JS 생성 횟수
     def genJsCnt = 2
     
+	/**
+	 * Backup Info.
+	 */
     // 백업 파일 보관 개수
     def filesToKeep = 3
     
+	/**
+	 * Jenkins Pipeline
+	 */
     // Jenkins 시작 단계
     stage("Jenkins Start"){
     	sh "whoami"
