@@ -12,7 +12,13 @@ node {
     	def response = build(
     		job: 'another-job',
     		wait: true, // true이면 동기식 / false이면 비동기식
-    		propagate: false // true이면 another-job의 결과에 영향을 받음 / false이면 another-job의 결과에 영향을 받지 않음
+    		propagate: false, // true이면 another-job의 결과에 영향을 받음 / false이면 another-job의 결과에 영향을 받지 않음
+    		parameters: [
+    			// (Optional)호출하면서 파라미터를 넘겨주고 싶을 때 사용
+    			// 호출 당하는 JOB에서는 "${params.PARAM_STRING_KEY}"로 사용
+    			string(name: 'PARAM_STRING_KEY', value: '전달할 문자열 값'),
+    			booleanParam(name: 'PARAM_BOOL_KEY', value: true)
+    		]
     	)
     	
     	if (response.result == 'SUCCESS') {
