@@ -45,7 +45,7 @@ node {
             ])
         } catch (err) {
         	// 에러 발생 시 설명 추가
-            buildDescription '[Error Occurred(Git Checkout Failed) :: ' + err.getMessage() + ']'
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage())
         }
@@ -68,7 +68,7 @@ node {
         	}
         } catch (err) {
             // 에러 발생 시 설명 추가
-            buildDescription '[Error Occurred(Push to Anothers Failed) :: ' + err.getMessage() + ']'
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage()) 
         }

@@ -72,7 +72,7 @@ node() {
             ])
         } catch (err) {
         	// 에러 발생 시 설명 추가
-            buildDescription "[Error Occurred(Git Checkout Failed) :: ${err.getMessage()}]"
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage())
         }
@@ -83,7 +83,7 @@ node() {
 			sh "tar -czvf ${backupFileNm} . || true"
 		} catch (err) {
         	// 에러 발생 시 설명 추가
-            buildDescription "[Error Occurred(Git Backup Failed) :: ${err.getMessage()}]"
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage())
 		}
@@ -104,7 +104,7 @@ node() {
 			removeBackupFile(backupFilePath, filesToKeep)
 		} catch (err) {
         	// 에러 발생 시 설명 추가
-            buildDescription "[Error Occurred(Move Backup File Failed) :: ${err.getMessage()}]"
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage())
 		}
