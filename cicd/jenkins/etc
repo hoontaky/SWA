@@ -19,3 +19,12 @@
  3-4. grooby 스크립트에서 환경 변수 사용
  : 직접적으로 환경 변수 사용 시에는 env.{param} ex> env.GIT_IP
  : 파리미터 처리해서 환경 변수 사용 시에는 env[{param}] ex> env[gitIp]
+
+4. SCM
+ 4-1. Lightweight checkout
+ : 활성화 시, jenkinsfile만 파싱하여 스크립트로 사용
+ : SCM 레파지토리 전체를 체크아웃하여 타 파일과 연동이 필요할 경우에는 비활성화 필요
+ 4-2. SCM 클론 체크가 필요할 경우(타 파일과 연동하려고하는데, 파일을 못 찾을 경우)
+ : stage("checkout scm") {
+       checkout scm
+   }
