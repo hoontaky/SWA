@@ -1,0 +1,19 @@
+// 외부 환경 변수 파일을 연동하여 변수 사용 스크립트
+
+node {
+	// SCM 소스 클론이 완료되었는지 확인
+	stage("Check SCM") {
+		checkout scm
+	}
+	
+	stage("Set Properties") {
+		def props = readProperties file: "config.properties" // 외부 환경 변수 파일의 SCM 내 위치와 파일 명 입력
+		env.SERVER_IP = props["SERVER_IP"]
+		
+		echo "SERVER_IP :: ${env.SERVER_IP}"
+		
+		props.each { key, value ->
+                        env."${key}" = value
+        }
+	}
+}
