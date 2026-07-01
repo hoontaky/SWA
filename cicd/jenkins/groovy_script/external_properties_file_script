@@ -3,6 +3,7 @@
 
 node {
 	// SCM 소스 클론이 완료되었는지 확인
+	// jenkinsfile 실행 시, config.properties 파일 인식이 잘 안될 경우에 작성
 	stage("Check SCM") {
 		checkout scm
 	}
