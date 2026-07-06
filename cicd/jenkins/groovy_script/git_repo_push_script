@@ -20,7 +20,7 @@ node {
     def appGitBranch = 'dev' 
     
     // Jenkins 시작 단계
-    stage('Jenkins Start'){
+    stage("Jenkins Start"){
     	// 현재 작업 디렉토리 출력
         echo workspace
         // 작업 디렉토리 정리
@@ -28,7 +28,7 @@ node {
     }
     
     // GitLab 체크아웃 단계
-    stage('Gitlab Checkout'){
+    stage("Gitlab Checkout"){
         try {
             step([$class: 'WsCleanup']) // 작업 디렉토리 정리
             checkout([
@@ -75,7 +75,7 @@ node {
     }
     
     // 젠킨스 빌드 파일 정리 단계
-    stage('Cleanup') {
+    stage("Cleanup") {
         // 작업 공간의 임시 파일 삭제
         dir("${env.WORKSPACE}@tmp") {
         	// 임시 디렉토리 삭제
