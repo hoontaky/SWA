@@ -52,7 +52,7 @@ node {
     }
 
     // Push dev branch to another branch
-    stage('Push to Anothers') {
+    stage("Push to Anothers") {
         try {
         	withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'password', usernameVariable: 'userName')]) {
         		dir("${workspace}") {
@@ -77,14 +77,14 @@ node {
     // 젠킨스 빌드 파일 정리 단계
     stage('Cleanup') {
         // 작업 공간의 임시 파일 삭제
-        dir(‘${env.WORKSPACE}@tmp’) {
+        dir("${env.WORKSPACE}@tmp") {
         	// 임시 디렉토리 삭제
             deleteDir()
         }
     }
     
     // 완료 단계
-    stage('Complete') {
+    stage("Complete") {
     	// 작업 완료 메시지 출력
         echo 'Job Complete'
     }
