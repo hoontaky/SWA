@@ -57,7 +57,8 @@ node {
         	withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'password', usernameVariable: 'userName')]) {
         		dir("${workspace}") {
         			sh """
-        				git remote set-url origin http://${username}:${password}@localhost:8084/${gitAppRepo}
+        				//git remote set-url origin http://${username}:${password}@localhost:8084/${gitAppRepo} >> 보안 취약점 존재: ${password}하면 안됨 >> \$password로 권고
+        				git remote set-url origin http://\$username:\$password@localhost:8084/${gitAppRepo}
         				git remove -v
         				git fetch origin
         				git switch dev
