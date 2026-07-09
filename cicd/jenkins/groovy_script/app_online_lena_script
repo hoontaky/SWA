@@ -80,13 +80,13 @@ node {
     // WAS Port(for Checking Health)
     def wasPort = 11100
     // WEB Deploy Path
-    def web_deploy_path = "/app/${pjtName}/front-end"
+    def webDeployPath = "/app/${pjtName}/front-end"
     // WEB Backup Path
-    def v_web_backup_path = "/backup/${pjtName}/front-end"
+    def webBackupPath = "/backup/${pjtName}/front-end"
 	// WAS Deploy Path
-	def was_deploy_path = "/dest/${pjtName}/back-end"
+	def wasDeployPath = "/dest/${pjtName}/back-end"
     // WAS Backup Path
-    def v_was_backup_path = "/backup/${pjtName}/back-end"
+    def wasBackupPath = "/backup/${pjtName}/back-end"
     
 	/**
 	 * Websquare Build Options
@@ -249,7 +249,7 @@ node {
 	    remote.password = password
 		// 웹 배포 경로 설정
 		// 배포할 정적 파일 이름 설정
-	    def static_file = "${pjtName}-static.tgz"
+	    def staticFile = "${pjtName}-static.tgz"
 	    
 	    // 웹 서버 IP 리스트를 순회하며 배포 진행
 	    for (int inx = 1; inx <= webIpList.size(); inx++) {
@@ -265,17 +265,17 @@ node {
             stage("WEB-${inx} Deploy") {
                 try {
                     // 배포 경로가 존재하는지 확인
-                    def webDeployPathRes = sshCommand remote: remote, command: "test -d ${web_deploy_path} && echo 1 || echo 2"
+                    def webDeployPathRes = sshCommand remote: remote, command: "test -d ${webDeployPath} && echo 1 || echo 2"
                     // 경로가 없으면 생성
                     if (webDeployPathRes == '2') {
-                        sshCommand remote: remote, command: "mkdir -p ${web_deploy_path}"
+                        sshCommand remote: remote, command: "mkdir -p ${webDeployPath}"
                     }
                     // 기존 파일 삭제
-                    sshCommand remote: remote, command: "/usr/bin/rm -rf ${web_deploy_path}/*"
+                    sshCommand remote: remote, command: "/usr/bin/rm -rf ${webDeployPath}/*"
                     // 정적 파일 업로드
-                    sshPut remote: remote, from: "${workspace}/target/${static_file}", into: "${web_deploy_path}/"
+                    sshPut remote: remote, from: "${workspace}/target/${staticFile}", into: "${webDeployPath}/"
                     // 정적 파일 압축 해제
-                    sshCommand remote: remote, command: "/usr/bin/tar -xzvf ${web_deploy_path}/${static_file} -C ${web_deploy_path}"
+                    sshCommand remote: remote, command: "/usr/bin/tar -xzvf ${webDeployPath}/${staticFile} -C ${webDeployPath}"
                 } catch (err) {
                     // 에러 발생 시 설명 추가
                     buildDescription "[Error Occurred(WEB-${inx} Deploy Failed) :: ${err.getMessage()}]"
@@ -290,17 +290,17 @@ node {
                     // 현재 날짜 및 시간 가져오기
                     now = new Date()
                     currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul'))
-                    def backFile = "${currentDate}-${static_file}" 
+                    def backupFile = "${currentDate}-${staticFile}" 
                     // 백업 경로가 존재하는지 확인
-                    def webBackupPathRes = sshCommand remote: remote, command: "test -d ${v_web_backup_path} && echo 1 || echo 2"
+                    def webBackupPathRes = sshCommand remote: remote, command: "test -d ${webBackupPath} && echo 1 || echo 2"
                     // 경로가 없으면 생성
                     if (webBackupPathRes == '2') {
-                        sshCommand remote: remote, command: "mkdir -p ${v_web_backup_path}"
+                        sshCommand remote: remote, command: "mkdir -p ${webBackupPath}"
                     }
                     // 파일 복사하여 백업
-                    sshCommand remote: remote, command: "/bin/cp ${web_deploy_path}/${static_file} ${v_web_backup_path}/${backFile}"
+                    sshCommand remote: remote, command: "/bin/cp ${webDeployPath}/${staticFile} ${webBackupPath}/${backupFile}"
                     // 백업 데이터 정리
-                    removeBackupData(remote, v_web_backup_path, filesToKeep)
+                    removeBackupData(remote, webBackupPath, filesToKeep)
                 } catch (err) {
                     // 에러 발생 시 설명 추가
                     buildDescription "[Error Occurred(WEB-${inx} Backup Failed) :: ${err.getMessage()}]"
@@ -309,7 +309,7 @@ node {
                 }
                 
                 // 배포 경로에서 백업 파일 삭제
-                sshCommand remote: remote, command: "/usr/bin/rm -rf ${web_deploy_path}/${static_file}"
+                sshCommand remote: remote, command: "/usr/bin/rm -rf ${webDeployPath}/${staticFile}"
             }
         }
     }
@@ -323,7 +323,7 @@ node {
 	    // 원격 서버 비밀번호 설정
 	    remote.password = password
 	    // 배포할 빌드 파일 이름 설정
-	    def build_file = "${pjtName}.war"
+	    def buildFile = "${pjtName}.war"
 	    
 	    // WAS 서버 IP 리스트를 순회하며 배포 진행
 	    def wasIp = ""
@@ -363,24 +363,24 @@ node {
             // WAS 서버 배포 단계
             stage("WAS-${inx} Deploy") {
                 try {
-                    def build_path = "${workspace}/target"
-                    dir(build_path) {
+                    def buildPath = "${workspace}/target"
+                    dir(buildPath) {
                         // 배포 경로가 존재하는지 확인
-                        def wasDeployPathRes = sshCommand remote: remote, command: "test -d ${was_deploy_path} && echo 1 || echo 2"
+                        def wasDeployPathRes = sshCommand remote: remote, command: "test -d ${wasDeployPath} && echo 1 || echo 2"
                         // 경로가 없으면 생성
                         if (wasDeployPathRes == '2') {
-                            sshCommand remote: remote, command: "mkdir -p ${was_deploy_path}"
+                            sshCommand remote: remote, command: "mkdir -p ${wasDeployPath}"
                         }
                         // 빌드 파일 목록 가져오기
                         def files = findFiles(glob: "**/*.war")
                         // 첫 번째 파일 선택
-                        build_file = files[0].name
+                        buildFile = files[0].name
                         // 기존 파일 삭제
-                        sshCommand remote: remote, command: "/usr/bin/rm -rf ${was_deploy_path}/*"
+                        sshCommand remote: remote, command: "/usr/bin/rm -rf ${wasDeployPath}/*"
                         // 빌드 파일 업로드
-                        sshPut remote: remote, from: "${build_path}/${build_file}", into: "${was_deploy_path}"
+                        sshPut remote: remote, from: "${buildPath}/${buildFile}", into: "${wasDeployPath}"
                         // 빌드 파일 압축 해제
-                        sshCommand remote: remote, command: "/usr/bin/unzip ${was_deploy_path}/${build_file} -d ${was_deploy_path}" 
+                        sshCommand remote: remote, command: "/usr/bin/unzip ${wasDeployPath}/${buildFile} -d ${wasDeployPath}" 
                     }
                 } catch (err) {
                     // 에러 발생 시 설명 추가
@@ -414,17 +414,17 @@ node {
                     // 현재 날짜 및 시간 가져오기
                     now = new Date()
                     currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul'))
-                    def backFile = "${currentDate}-${build_file}"
+                    def backupFile = "${pjtName}-${currentDate}.war"
                     // 백업 경로가 존재하는지 확인
-                    def wasBackupPathRes = sshCommand remote: remote, command: "test -d ${v_was_backup_path} && echo 1 || echo 2"
+                    def wasBackupPathRes = sshCommand remote: remote, command: "test -d ${wasBackupPath} && echo 1 || echo 2"
                     // 경로가 없으면 생성
                     if (wasBackupPathRes == '2') {
-                        sshCommand remote: remote, command: "mkdir -p ${v_was_backup_path}"
+                        sshCommand remote: remote, command: "mkdir -p ${wasBackupPath}"
                     }
                     // 파일 복사하여 백업
-                    sshCommand remote: remote, command: "/bin/cp ${was_deploy_path}/${build_file} ${v_was_backup_path}/${backFile}" 
+                    sshCommand remote: remote, command: "/bin/cp ${wasDeployPath}/${buildFile} ${wasBackupPath}/${backupFile}" 
                     // 백업 데이터 정리
-                    removeBackupData(remote, v_was_backup_path, filesToKeep)
+                    removeBackupData(remote, wasBackupPath, filesToKeep)
                 } catch (err) {
                     // 에러 발생 시 설명 추가
                     buildDescription "[Error Occurred(WAS-${inx} Backup Failed) :: ${err.getMessage()}]"
@@ -433,7 +433,7 @@ node {
                 }
                 
                 // 배포 경로에서 백업 파일 삭제
-                sshCommand remote: remote, command: "/usr/bin/rm -rf ${was_deploy_path}/${build_file}" 
+                sshCommand remote: remote, command: "/usr/bin/rm -rf ${wasDeployPath}/${buildFile}" 
             }
             
             // WAS 서버 체크 단계
