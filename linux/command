@@ -128,3 +128,9 @@ gg -> V -> G -> d
 u
 전체 선택 및 복사
 gg -> V -> G -> y
+
+#rsync(폴더를 제외하고 나머지 전체 경로를 복사할 때)
+rsync -av --exclude='제외할폴더명' /원본경로/ /목적지경로/
+>> 주의할 점: 원본 경로 뒤에 슬래시(/)를 꼭 붙여야 합니다. (예: /app/로 작성해야 /app 내부의 내용물만 복사됩니다.)
+>> 예시: /app 폴더 전체를 /app_backup으로 복사하되, logs 폴더와 tmp 폴더를 제외하고 싶을 때
+  : rsync -av --exclude='logs' --exclude='tmp' /app/ /app_backup/
