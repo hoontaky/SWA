@@ -1,0 +1,43 @@
+#Gitbucket 레파지토리 초기화(소스만 삭제하고 나머지 설정은 유지)
+
+cd {repo_path}
+
+rm -rf objects/ refs/ logs/ hooks/ info/
+
+git init --bare
+
+git config --global --add safe.directory ${repo_path}
+
+systemctl restart gitbucket.service
+
+git init
+
+git checkout -b dev
+
+git remote add origin http://root@{gitbucket_url}/git/grp/repo.git
+
+echo "MESSAGE INFO" >> README.md
+
+git add *
+
+git commit --allow-empty -m "Init Repository"
+
+chmod -R 777 {repo_path}
+
+git push origin dev
+
+=========================================================================
+[Example]
+cd /app/cicd/gitbucket/data/repositories/spo/ewpApp.git
+rm -rf objects/ refs/ logs/ hooks/ info/
+git init --bare
+git config --global --add safe.directory /app/cicd/gitbucket/data/repositories/spo/ewpApp.git
+systemctl restart gitbucket.service
+git init
+git checkout -b dev
+git remote add origin http://root@192.0.0.1:9084/git/spo/ewpApp.git
+echo "Project Name" >> README.md
+git add README.md
+git commit --allow-empty -m "Init Repository"
+chmod -R 777 /app/cicd/gitbucket/data/repositories/spo/ewpApp.git
+git push origin dev

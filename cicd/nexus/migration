@@ -1,0 +1,55 @@
+[1단계] 구형 서버 백업 및 새 서버로의 복원
+1. 구형 서버의 Nexus 서비스를 완전히 종료합니다.
+2. 구형 서버의 sonatype-work/nexus3/ 디렉터리 전체(특히 환경 설정 및 DB가 담긴 db/ 또는 blobs/ 등)를 압축하여 새 서버의 동일 구동 환경 경로로 복사합니다.
+3. 새 서버에서 Nexus 서비스를 시작합니다.
+   이 상태에서는 웹 UI 로그인 시 과거에 사용하던 관리자 계정, 권한, 저장소 목록이 그대로 보이며, 과거 라이브러리 목록도 화면에 노출됩니다.
+
+[2단계] 모든 라이브러리를 날리기 위한 Cleanup Policy(정리 정책) 생성
+웹 UI에서 일괄 삭제 명령을 내리기 위해, "모든 파일을 삭제 대상"으로 잡는 가상의 정책을 만듭니다.
+1. Nexus 웹 UI에 관리자 계정으로 로그인한 뒤, 상단 Administration (톱니바퀴 아이콘) ➡️ Repository ➡️ Cleanup Policies 메뉴로 이동합니다.
+2. Create Cleanup Policy 버튼을 클릭합니다.
+3. 설정을 아래와 같이 입력합니다
+ :Name: delete-all-policy
+ :Format: All formats (모든 타입의 저장소에 적용)
+ :Criteria (기준): Component Age (Days) 항목에 체크하고 값을 0으로 입력합니다. 
+  (즉, 업로드된 지 0일이 지난 모든 파일을 삭제 대상으로 지정)
+4. Save를 눌러 정책을 저장합니다.
+
+[3단계] 각 Repository에 삭제 정책 연결하기
+초기화하고 싶은 저장소(예: maven-releases, maven-snapshots 등)들에 방금 만든 정책을 매핑합니다.
+1. Administration ➡️ Repository ➡️ Repositories 메뉴로 이동합니다.
+2. 비우고자 하는 저장소를 클릭하여 설정 편집 화면으로 들어갑니다.
+3. 설정 항목 중 Cleanup ➡️ Policy 셀렉트 박스에서 방금 만든 delete-all-policy를 선택합니다.
+4. 화면 최하단의 Save 버튼을 누릅니다.
+ (초기화할 모든 Hosted / Proxy 저장소에 이 작업을 반복합니다.)
+ 
+[4단계] Task를 이용한 Soft Delete (DB 및 웹 UI 비우기)
+이제 스케줄러(Task)를 수동 실행하여 조건에 맞는(0일 이상 된 모든) 라이브러리를 메타데이터 상에서 지워줍니다.
+1. Administration ➡️ System ➡️ Tasks 메뉴로 이동합니다.
+2. 기본적으로 시스템에 등록되어 있는 Admin - Cleanup repositories using their associated policies (또는 명칭이 Cleanup service) 태스크를 목록에서 찾습니다.
+3. 해당 태스크를 클릭한 뒤 상단의 Run 버튼을 눌러 즉시 실행합니다.
+4. 결과 확인: 이 작업이 끝나면 Browse 메뉴로 가서 저장소들을 확인했을 때, 기존 라이브러리 컴포넌트 목록들이 깨끗하게 사라진 것을 볼 수 있습니다.
+ (내부 DB상으로는 지워졌으나 디스크 용량은 아직 줄어들지 않은 Soft Delete 상태입니다).
+ 
+[5단계] Compact Blob Store를 이용한 Hard Delete (디스크 용량 비우기)
+실제 서버 하드디스크에 남아있는 유령 바이너리 파일들을 완전히 파쇄하여 용량을 확보하는 단계입니다.
+1. 다시 Administration ➡️ System ➡️ Tasks 메뉴로 이동합니다.
+2. 상단의 Create Task 버튼을 누릅니다.
+3. 태스크 유형 중에서 Admin - Compact blob store를 선택합니다.
+4. 설정을 입력합니다
+ : Task Name: Hard Delete Task
+ : Blob Store: 비우고자 하는 대상 블롭스토어 선택 (보통 default)
+ : Task Frequency: Manual (수동 실행용)
+5. Create Task를 눌러 생성한 뒤, 목록에서 해당 태스크를 찾아 Run 버튼을 눌러 실행합니다.
+6. 결과 확인: 서버 터미널에서 df -h 등으로 디스크 용량을 확인하면 구형 파일들이 삭제되어 용량이 대폭 확보된 것을 확인할 수 있습니다.
+
+[최종 조치] 신규 업로드를 위한 설정 원복 (중요)데이터가 완벽히 비워졌으므로 새 서버로 이관될 준비가 끝났습니다. 이제 나중에 curl --upload-file 등으로 정상 업로드가 가능하도록 뒤처리를 해줍니다.
+1. 정책 해제: Repositories 설정으로 다시 들어가, 3단계에서 등록했던 delete-all-policy를 None으로 변경하고 저장합니다.
+  (해제하지 않으면 새로 올리는 파일도 계속 실시간으로 지워집니다.)
+2. 배포 정책 변경: 동일한 저장소 설정 화면에서 Deployment policy 항목을 찾아 잠시 Allow redeploy로 변경해 둡니다. 
+  (이후 스크립트로 대량 업로드 시 발생할 수 있는 중복 에러나 꼬임 현상을 방지하기 위함이며, 이관 완료 후 다시 원복하시면 됩니다.)
+  
+[이관 후, 신규 서버 작업]
+1. Repository - Rebuild repository index (검색 및 다운로드 인덱스 빌드)
+2. Maven - Rebuild Maven metadata (꼬이거나 누락된 maven-metadata.xml 재구성)
+
