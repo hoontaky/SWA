@@ -1,24 +1,24 @@
 import groovy.json.JsonSlurperClassic
 
-def removeBackupData(remote, file_path, keep_count) {
+def removeBackupData(remote, filePath, keepCount) {
 	// 원격 서버에서 오래된 백업 데이터를 제거하는 함수
   	// 기존 백업 파일 수 가져오기
-  	def file_count_str = sshCommand(remote: remote, command: "ls ${file_path} | wc -l")  // 파일 경로와 명령 결합
-  	def file_count = Integer.parseIn(file_count_str)  // 문자열을 정수로 변환
+  	def fileCountStr = sshCommand(remote: remote, command: "ls ${filePath} | wc -l")  // 파일 경로와 명령 결합
+  	def fileCount = Integer.parseIn(fileCountStr)  // 문자열을 정수로 변환
    	// 유지해야 할 최대 파일 수보다 기존 파일 수가 많은지 확인
-  	if (file_count > keep_count) {
+  	if (fileCount > keepCount) {
     	// 삭제할 파일 목록 가져오기 (수정 시간 기준 오래된 순으로 정렬)
-    	def files = sshCommand(remote: remote, command: "ls ${file_path} -t -r")
+    	def files = sshCommand(remote: remote, command: "ls ${filePath} -t -r")
 		// 수정 시간 기준으로 파일 나열
     	// 파일 목록을 개별 파일 이름으로 분할
-    	def file_list = files.split('\\r?\\n')
+    	def fileList = files.split('\\r?\\n')
 		// 개행문으로 분할
     	// 삭제할 파일 수만큼 반복 (최대 유지 수 초과 파일만 삭제)
-    	for (int inx = 0; inx < (file_count - keep_count); inx++) {
+    	for (int inx = 0; inx < (fileCount - keepCount); inx++) {
     		// 삭제할 파일 이름 출력 (정보 제공)
-      		echo '삭제할 파일 이름: [${file_list[inx].trim()}]'
+      		echo '삭제할 파일 이름: [${fileList[inx].trim()}]'
     		// 원격 서버의 'rm' 명령을 사용하여 특정 파일 삭제
-      		sshCommand(remote: remote, command: "/usr/bin/rm -rf ${file_path}/${file_list[inx].trim()}")  // 전체 파일 경로 구성 및 삭제 실행
+      		sshCommand(remote: remote, command: "/usr/bin/rm -rf ${filePath}/${fileList[inx].trim()}")  // 전체 파일 경로 구성 및 삭제 실행
     	}
   	}
 }
@@ -144,7 +144,7 @@ node {
             ])
         } catch (err) {
         	// 에러 발생 시 설명 추가
-            buildDescription "[Error Occurred(Git Checkout Failed) :: ${err.getMessage()}]"
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage())
         }
@@ -214,7 +214,7 @@ node {
                 }
             } catch (err) {
                 // 에러 발생 시 설명 추가
-                buildDescription "[Error Occurred(Javascript Generate from xml Failed) :: ${err.getMessage()}]"
+                buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                 // 에러 발생 시 예외 던지기
                 throw new Exception(err.getMessage()) 
             }
@@ -233,7 +233,7 @@ node {
             }
         } catch (err) {
             // 에러 발생 시 설명 추가
-            buildDescription "[Error Occurred(Maven Build Failed) :: ${err.getMessage()}]"
+            buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
             // 에러 발생 시 예외 던지기
             throw new Exception(err.getMessage()) 
         }
@@ -278,7 +278,7 @@ node {
                     sshCommand remote: remote, command: "/usr/bin/tar -xzvf ${webDeployPath}/${staticFile} -C ${webDeployPath}"
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WEB-${inx} Deploy Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
@@ -290,7 +290,7 @@ node {
                     // 현재 날짜 및 시간 가져오기
                     now = new Date()
                     currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul'))
-                    def backupFile = "${currentDate}-${staticFile}" 
+                    def backupFile = "${pjtName}-${currentDate}.war" 
                     // 백업 경로가 존재하는지 확인
                     def webBackupPathRes = sshCommand remote: remote, command: "test -d ${webBackupPath} && echo 1 || echo 2"
                     // 경로가 없으면 생성
@@ -303,7 +303,7 @@ node {
                     removeBackupData(remote, webBackupPath, filesToKeep)
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WEB-${inx} Backup Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
@@ -354,7 +354,7 @@ node {
                     }
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WAS-${inx} Stop Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
@@ -384,7 +384,7 @@ node {
                     }
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WAS-${inx} Deploy Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
@@ -402,7 +402,7 @@ node {
                     }
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WAS-${inx} Start Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
@@ -427,7 +427,7 @@ node {
                     removeBackupData(remote, wasBackupPath, filesToKeep)
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WAS-${inx} Backup Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
@@ -466,7 +466,7 @@ node {
                     }
                 } catch (err) {
                     // 에러 발생 시 설명 추가
-                    buildDescription "[Error Occurred(WAS Check Failed) :: ${err.getMessage()}]"
+                    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
                     // 에러 발생 시 예외 던지기
                     throw new Exception(err.getMessage()) 
                 }
