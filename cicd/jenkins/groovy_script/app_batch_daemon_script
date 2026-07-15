@@ -1,21 +1,21 @@
 // 원격 서버에서 백업 데이터를 제거하는 함수 정의
-def removeBackupData(remote, file_path, keep_count) {
+def removeBackupData(remote, filePath, keepCount) {
 	// 원격 서버에서 백업 파일 수를 계산
-	def file_count_str = sshCommand remote: remote, command: "ls ${file_path} | wc -l"
+	def fileCountStr = sshCommand remote: remote, command: "ls ${filePath} | wc -l"
 	// 파일 수를 정수로 변환
-	def file_count = Integer.parseInt(file_count_str.trim())
+	def fileCount = Integer.parseInt(fileCountStr.trim())
 	// 파일 수가 유지해야 할 파일 수보다 많으면 백업 제거 작업 수행
-    if (file_count > keep_count) {
+    if (fileCount > keepCount) {
         // 파일 리스트를 시간 순서대로 역순으로 가져옴
-        def files = sshCommand remote: remote, command: "ls ${file_path} -t -r"
+        def files = sshCommand remote: remote, command: "ls ${filePath} -t -r"
         // 파일 리스트를 줄바꿈으로 분할
-        def file_list = files.split('\\r?\\n')
+        def fileList = files.split('\\r?\\n')
         // 오래된 파일을 삭제
-        for (int inx = 0; inx < (file_count - keep_count); inx++) {
+        for (int inx = 0; inx < (fileCount - keepCount); inx++) {
         	// 삭제된 파일 이름 출력
-            echo "removed file name: [${file_list[inx].trim()}]"
+            echo "removed file name: [${fileList[inx].trim()}]"
             // 파일 삭제
-            sshCommand remote: remote, command: "/usr/bin/rm -rf ${file_path}/${file_list[inx].trim()}"
+            sshCommand remote: remote, command: "/usr/bin/rm -rf ${filePath}/${fileList[inx].trim()}"
         }
     }
 }
@@ -37,9 +37,9 @@ node {
     // 현재 날짜를 저장할 변수 초기화
     def currentDate = ''
     // Jenkins Job 이름 가져오기
-    def jobName = Job_NAME
+    def jobName = env.JOB_NAME
     // 환경 이름 추출
-    def envName = JobName.split('-')[0]
+    def envName = jobName.split('-')[0]
     // 프로젝트 이름 초기화
     def pjtName = ''
     
@@ -135,7 +135,7 @@ node {
 	        // Maven 환경 설정 후 빌드 명령어 실행
 	        withEnv(['MAVEN_HOME=${tool 'MAVEN_HOME'}']) {
 	            // Maven을 사용하여 프로젝트를 클린하고 설치, 테스트는 스킵하고 업스트림 종속성을 최신으로 업데이트 (-U 옵션)
-	            sh '${MAVEN_HOME}/bin/mvn clean install -X -Dmaven.test.skip=true -U'
+	            sh "${MAVEN_HOME}/bin/mvn clean install -X -Dmaven.test.skip=true -U"
 	        }
 	    } catch (err) {
 	        // 빌드 실패 시 빌드 설명에 에러 메시지를 추가
@@ -157,9 +157,9 @@ node {
 	    
 	    // 배포 경로 설정
 	    // WAS 배포 경로
-	    def was_deploy_path = "/app/jeus/online/${mwInsName}"
+	    def wasDeployPath = "/app/jeus/online/${mwInsName}"
 	    // 빌드 파일 이름
-	    def build_file = "${pjtName}.war"
+	    def buildFile = "${pjtName}.war"
         // 각 WAS 서버에 대해 반복
 		for (int inx = 1; inx <= wasIpList.size(); inx++) {
         	// IP가 빈 문자열이거나 길이가 0인 경우 건너뜀
@@ -201,7 +201,7 @@ node {
         			}
     			} catch (err) {
         			// 에러 발생 시 빌드 설명에 에러 메시지 추가
-        			buildDescription "[Error Occurred(Batch Stop Failed) :: ${err.getMessage()}]"
+        			buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
         			// 예외 발생으로 빌드를 실패 처리
         			throw new Exception(err.getMessage())
     			}
@@ -211,37 +211,37 @@ node {
 			stage("Batch-${inx} Backup") {
     			try {
         			// 배포 경로에 파일 개수 확인을 위한 SSH 명령 실행
-        			def file_count_str = sshCommand remote: remote, command: "/bin/ls ${was_deploy_path}/${build_file} | wc -l"
+        			def fileCountStr = sshCommand remote: remote, command: "/bin/ls ${wasDeployPath}/${buildFile} | wc -l"
         			// 파일 개수를 정수로 변환
-        			def file_count = Integer.parseInt(file_count_str)
+        			def fileCount = Integer.parseInt(fileCountStr)
         
         			// 파일 개수가 0보다 큰 경우 실행
-        			if (file_count > 0) {
+        			if (fileCount > 0) {
 			            // 현재 시간을 얻어옴
 			            now = new Date()
 			            currentDate = now.format('yyyy-MM-dd.HH:mm:ss', TimeZone.getTimeZone('Asia/Seoul'))
 			            // 백업 파일 이름 생성
-			            def backFile = "${currentDate}-${build_file}"
+			            def backupFile = "${pjtName}-${currentDate}.war"
 			            // WAS 백업 경로 정의
-			            def v_was_backup_path = "/data/jeus/backup/batch/${pjtName}"
+			            def wasBackupPath = "/data/jeus/backup/batch/${pjtName}"
 			            
 			            // 백업 경로가 존재하는지 확인하는 SSH 명령 실행
-			            def wasBackupPathRes = sshCommand remote: remote, command: "test -d ${v_was_backup_path} && echo 1 || echo 2"
+			            def wasBackupPathRes = sshCommand remote: remote, command: "test -d ${wasBackupPath} && echo 1 || echo 2"
 			            
 			            // 백업 경로가 없는 경우 생성
 			            if (wasBackupPathRes == '2') {
-			                sshCommand remote: remote, command: "mkdir -p ${v_was_backup_path}"
+			                sshCommand remote: remote, command: "mkdir -p ${wasBackupPath}"
 			            }
 			            
 			            // 파일을 백업 경로로 복사하는 SSH 명령 실행
-			            sshCommand remote: remote, command: "/bin/cp ${was_deploy_path}/${build_file} ${v_was_backup_path}/${backFile}"
+			            sshCommand remote: remote, command: "/bin/cp ${wasDeployPath}/${buildFile} ${wasBackupPath}/${backupFile}"
 			            
 			            // 백업 데이터 정리 함수 호출
-			            removeBackupData(remote, v_was_backup_path, filesToKeep)
+			            removeBackupData(remote, wasBackupPath, filesToKeep)
 			        }
 			    } catch (err) {
 			        // 에러 발생 시 빌드 설명에 에러 메시지 추가
-			        buildDescription "[Error Occurred(Batch Backup Failed) :: ${err.getMessage()}]"
+			        buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
 			        // 예외 발생으로 빌드를 실패 처리
 			        throw new Exception(err.getMessage())
 			    }
@@ -251,25 +251,25 @@ node {
 			stage("Batch-${inx} Deploy") {
     			try {
 			        // 로컬 빌드 경로 설정
-			        def build_path = "${workspace}/target"
-			        dir(build_path) {
+			        def buildPath = "${workspace}/target"
+			        dir(buildPath) {
 				        // 원격 서버에 배포할 경로 존재 여부 확인
-				        def wasDeployPathRes = sshCommand remote: remote, command: "test -d ${was_deploy_path} && echo 1 || echo 2"
+				        def wasDeployPathRes = sshCommand remote: remote, command: "test -d ${wasDeployPath} && echo 1 || echo 2"
 				        if (wasDeployPathRes == '2') {
-				            sshCommand remote: remote, command: "mkdir -p ${was_deploy_path}"
+				            sshCommand remote: remote, command: "mkdir -p ${wasDeployPath}"
 				        }
 				        // 빌드된 파일 중 첫 번째 *.jar 파일 선택
 				        def files = findFiles(glob: "**/*.jar")
-				        build_file = files[0].name
+				        buildFile = files[0].name
 				        
 				        // 원격 서버의 기존 파일 모두 삭제
-				        sshCommand remote: remote, command: "/usr/bin/rm -rf ${was_deploy_path}/*"
+				        sshCommand remote: remote, command: "/usr/bin/rm -rf ${wasDeployPath}/*"
 				        // 선택한 빌드 파일을 원격 서버로 전송
-				        sshPut remote: remote, from: "${build_path}/${build_file}", into: "${was_deploy_path}"
+				        sshPut remote: remote, from: "${buildPath}/${buildFile}", into: "${wasDeployPath}"
 			        }
 			    } catch (err) {
 			        // 에러 발생 시 빌드 설명에 에러 메시지 추가
-			        buildDescription "[Error Occurred(Batch Deploy Failed) :: ${err.getMessage()}]"
+			        buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
 			        // 예외 발생으로 빌드를 실패 처리
 			        throw new Exception(err.getMessage())
 			    }
@@ -334,7 +334,7 @@ node {
 	    				sshCommand remote: remote, command: "nohup java -jar ${replacedString} ${appHome}/${pjtName}.jar 1>${logHome}/application.log 2>&1 &"
 					} catch (err) {
 					    // 예외 발생 시 에러 메시지를 빌드 설명에 추가하고 예외를 다시 던집니다.
-					    buildDescription "[Error Occurred(Batch-${inx} Start Failed) :: ${err.getMessage()}]"
+					    buildDescription "[Error Occurred(${env.STAGE_NAME} Failed) :: ${err.getMessage()}]"
 					    throw new Exception(err.getMessage())
 					}
 				}
