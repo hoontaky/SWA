@@ -1,8 +1,26 @@
-Initial Settings
-- repository
+#Initial Settings
+
+1. apache-maven
+2. apache-tomcat
+3. dbbeaver(optional)
+4. eclipse
+5. jdk
+6. repository
 : nexus 연동 경로
-- apache maven
-: /conf/settins.xml에 <settings> 다음에 local repository 경로 설정(<localRepository>)
-- jdk
+: /conf/settins.xml에 <settings> 다음에 local repository 경로 설정(<localRepository>) 
+7. workspace
+: 개발자 작업 경로
+8. eclipse.exe - 바로가기
 
 위의 폴더를 eclipse와 묶어서 하나로 배포
+
+
+==========================예시==========================
+apache-maven-3.9.14
+apache-tomcat-9.0.115
+dbeaver
+eclipse
+jdk-17.0.2
+repository
+workspace
+eclipse.exe - 바로가기
