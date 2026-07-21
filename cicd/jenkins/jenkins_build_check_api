@@ -1,0 +1,37 @@
+# 빌드 결과 조회 API 호출
+
+curl -u "<jenkins_user>:<token>" "http://<jenkins_url>/job/<project_name>/lastBuild/api/json?tree=number,result,url,timestamp
+
+=====================================================Sample=====================================================
+
+#!/bin/bash
+#Group List
+grps=("cio" "moj")
+
+#Project List
+pjts=("ewpApp" "ewpBat")
+
+i=0
+iLen=${#grps[@]}
+
+while [ $i -lt $iLen ]; do
+	grp=${grps[$i]}
+	
+	j=0
+	jLen=${#pjts[@]}
+	
+	while [ $j -lt $jLen ]; do
+	
+		curl -u "admin:XXXXXXXXXXXXXXXXXX" "http://localhost:8085/job/dev-$grp-$pjt/lastBuild/api/json?tree=number,result,url,timestamp"
+		echo ""
+	
+		((j++))
+	
+	done
+	
+	((i++))
+	
+done
+
+exit 1
+	
