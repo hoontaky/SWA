@@ -2,6 +2,8 @@
 
 curl -u "<jenkins_user>:<token>" "http://<jenkins_url>/job/<project_name>/lastBuild/api/json?tree=number,result,url,timestamp
 
+사용자 별, token 발급은 Jenkins 프로필 클릭 > Security > "Add new token" 
+
 =====================================================Sample=====================================================
 
 #!/bin/bash
