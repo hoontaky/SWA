@@ -1,0 +1,22 @@
+# 히스토리 삭제 가이드
+1. git clone http://<git-rep-url>
+
+2. cd <git-repo>
+
+3. 과거 히스토리가 없는 임시 독립 브랜치 생성(--orphan 플래그는 이전 커밋들과 링크가 완전히 끊어진, 히스토리가 빈 상태의 브랜치를 만듭니다.)
+ : git checkout --orphan temp_branch
+
+4. 현재 상태의 모든 파일 스테이징(Staging)(과거 이력은 사라지지만, 현재 폴더에 있는 최신 소스코드는 그대로 무대에 올라갑니다.)
+ : git add -A
+
+5. 새로운 첫 커밋 생성
+ : git commit -m "Initial commit"
+
+6. 과거 히스토리가 남아있는 기존 브랜치 삭제(※ 브랜치명이 master라면 git branch -D master로 입력하세요.)
+ : git branch -D main
+ 
+7. 임시 브랜치 이름을 원래 기본 브랜치명으로 변경
+ : git branch -m main
+
+8. GitBucket 원격 저장소에 강제 푸시(Overwrite)(-f (Force) 옵션을 사용하여 GitBucket 서버에 남아있던 과거 히스토리를 덮어쓰고 완전히 지워버립니다)
+ : git push -f origin main
