@@ -18,5 +18,5 @@
 7. 임시 브랜치 이름을 원래 기본 브랜치명으로 변경
  : git branch -m main
 
-8. GitBucket 원격 저장소에 강제 푸시(Overwrite)(-f (Force) 옵션을 사용하여 GitBucket 서버에 남아있던 과거 히스토리를 덮어쓰고 완전히 지워버립니다)
+8. GitBucket 원격 저장소에 강제 푸시(Overwrite)(-f (Force) 옵션을 사용하여 GitBucket 서버에 남아있던 과거 히스토리를 덮어쓰고 완전히 지워버립니다.)
  : git push -f origin main
