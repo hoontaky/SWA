@@ -20,3 +20,23 @@
 
 8. GitBucket 원격 저장소에 강제 푸시(Overwrite)(-f (Force) 옵션을 사용하여 GitBucket 서버에 남아있던 과거 히스토리를 덮어쓰고 완전히 지워버립니다.)
  : git push -f origin main
+ 
+------------------------- for example -------------------------
+
+# 1. prd 브랜치로 이동 및 최신 상태 동기화
+git checkout prd
+git pull origin prd
+
+# 2. prd의 최신 소스만 가진 독립(Orphan) 임시 브랜치 생성
+git checkout --orphan temp-prd
+
+# 3. 모든 파일 스테이징 및 첫 커밋 생성
+git add -A
+git commit -m "Initial commit - prd"
+
+# 4. 기존 로컬 prd 브랜치를 삭제하고, 임시 브랜치 이름을 prd로 변경
+git branch -D prd
+git branch -m prd
+
+# 5. GitBucket 원격 저장소에 강제 푸시 (과거 이력 완전 삭제)
+git push -f origin prd
