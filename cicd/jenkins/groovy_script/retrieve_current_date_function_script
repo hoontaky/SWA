@@ -1,0 +1,24 @@
+// 현재 날짜/시간 조회 함수 구현
+
+def getCurrentDate(format = null) {
+	// 현재 시간 변수
+	def now = Date()
+	// 현재 날짜 변수
+	def currentDate = ""
+	
+	if(format == null || format == "") {
+		return currentDate = now.format("yyyy-MM-dd-HH-mm-ss", TimeZone.getTimeZone("Asia/Seoul")
+	} else {
+		return currentDate = now.format(format, TimeZone.getTimeZone("Asia/Seoul")
+	}
+}
+
+node {
+	
+	stage("Call Function Test") {
+		echo "NOW Ver.1 :: [${getCurrentDate("yyyy-MM-dd HH.mm.ss)}]"
+		
+		echo "NOW Ver.2 :: [${getCurrentDate()}]"
+	}
+	
+}
