@@ -1,0 +1,10 @@
+def str = "abcDef"
+
+# toUpperCase
+str.toUpperCase() >> ABCDEF
+
+# toLowerCase
+str.toLowerCase() >> abcdef
+
+# capitalize
+str.capitalize() >> AbcDef
