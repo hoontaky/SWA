@@ -5,3 +5,44 @@ git ls-files | xargs -I {} git log -1 --format="%and | %ae | %ad | {}" -- {}
 
 2. GIT 특정 확장자 제외한 목록 조회
 git ls-files | grep -v -E "\.(png|js|css|gif)$" | xargs -I {} git log -1 --format="%and | %ae | %ad | {}" -- {}
+
+
+
+------------------------------ for example ------------------------------
+
+#!/bin/bash
+
+#Check User
+RUNNER=`whoami`
+if [ ${RUNNER} != 'cicdadm' ] ; then
+  echo "Deny Access : [ ${RUNNER} ]. Not [cicdadm]"
+  exit 1
+fi
+
+#PARAMETER
+main_path=/app/cicd/work/program
+work_path=$main_path/work
+rslt_path=$main_path/result
+today=$(date +%F)
+
+#CREATE PATH
+mkdir -p $work_path
+mkdir -p $rslt_path
+mkdir -p $rslt_path/$today
+cd $work_path
+
+#EWP APP
+git clone -b dev http://<git_url>/git/moj/ewpApp.git
+
+cd $work_path/ewpApp
+git ls-files | grep -v -E "\.(png|js|css|gif)$" | xargs -I {} git log -1 --format="%and | %ae | %ad | {}" -- {} >> $rslt_path/today/ewpApp.txt
+
+cd $work_path
+
+#EWP BAT
+git clone -b dev http://<git_url>/git/moj/ewpBat.git
+
+cd $work_path/ewpBat
+git ls-files | grep -v -E "\.(png|js|css|gif)$" | xargs -I {} git log -1 --format="%and | %ae | %ad | {}" -- {} >> $rslt_path/today/ewpBat.txt
+
+cd $work_path
