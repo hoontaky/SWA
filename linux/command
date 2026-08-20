@@ -140,3 +140,14 @@ nproc
 
 #Memory 용량 확인
 free -h
+
+#tcp 옵션 확인
+sudo sysctl -a | grep -E "ip4.tcp"
+
+#port 접속 모니터링
+$ while true; do netstat -anol | grep <port> | wc -l; sleep 1; done
+
+#process network 모니터링
+strace -f -t -tt -s 1024 -e trace=network -p $(ps -ef | grep <processName> | grep java | awk '{print $2}') 2 > & 1 | grep -E "close|shutdown|LINGER"
+
+strace -f -t -tt -s 1024 -e trace=setsockopt,close -p $(ps -ef | grep <processName> | grep java | awk '{print $2}') 2 > & 1 | grep -E "LINGER|close\(8[0-9]\)"
