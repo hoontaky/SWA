@@ -1,0 +1,15 @@
+#HTTP 유입 시, HTTPS로 리다이렉트
+RewriteEngine on
+RewriteCond %{HTTPS} !on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R,L]
+
+#http://URL/ 라고 브라우저에 입력 시, http://URL/ewp 입력과 동일하게 동작
+RewriteRule ^/?$ /ewp/ [R=302,L]
+
+#브라우저에 /download 입력 시, WEB 서버의 특정 경로의 파일을 다운로드 할 수 있도록 설정
+Alias /download/ "/app/lena/module/"
+<Directory "/app/lena/module/"?
+  Options -Indexes -FollowSymLinks
+  AllowOverride None
+  Require all granted
+</Directory>
