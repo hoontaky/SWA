@@ -23,8 +23,13 @@ while [ $i -lt $iLen ]; do
 	jLen=${#pjts[@]}
 	
 	while [ $j -lt $jLen ]; do
-	
+		
+		# Version 1
 		curl -u "admin:XXXXXXXXXXXXXXXXXX" "http://localhost:8085/job/dev-$grp-$pjt/lastBuild/api/json?tree=number,result,url,timestamp"
+		# Version 2
+		curl -u "admin:XXXXXXXXXXXXXXXXXX" "http://localhost:8085/job/dev-$grp-$pjt/lastBuild/api/json?tree=number,result,url,timestamp" 
+		| awk '{match($0, /"timestamp":[0-9]+/); ts=substr($0, RSTART+12, 10); dt=strftime("%Y-%m-%d %H:%M:%S", ts); sub(/"timestamp":[0-9]+/, "\"timestamp\":\"" dt "\"", $0); print }'
+		| sed 's/"_class":"org.jenkinsci.plugins.workflow.job.WorkflowRun", \s*//g'
 		echo ""
 	
 		((j++))
