@@ -13,3 +13,17 @@ Alias /download/ "/app/lena/module/"
   AllowOverride None
   Require all granted
 </Directory>
+
+#특정 IP만 접근 허용 시, vhost 파일에 설정
+<Location "<context>">
+	<RequireAny>
+		Require ip <access_ip>
+	</RequireAny>
+</Location>
+
+#특정 IP만 접근 미허용 시, vhost 파일에 설정
+<Location "<context>">
+	<RequireAll>
+		Require not ip <access_ip>
+	</RequireAll>
+</Location>
