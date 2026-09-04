@@ -1,0 +1,15 @@
+{
+    "$type": "SourceTree.Api.Host.Identity.Model.IdentityAccount, SourceTree.Api.Host.Identity",
+    "Authenticate": true,
+    "HostIdentity": {
+      "$type": "SourceTree.Api.Host.Identity.Model.AtlassianAccountIdentity, SourceTree.Api.Host.Identity",
+      "Username": "ewtes",
+      "Email": "ewtes@ewtes.net"
+    },
+    "Host": {
+      "$type": "SourceTree.Api.Host.Identity.Model.AtlassianAccountHost, SourceTree.Api.Host.Identity",
+      "Id": "atlassian",
+      "Name": "Atlassian",
+      "Url": "https://id.atlassian.com/"
+    }
+  }

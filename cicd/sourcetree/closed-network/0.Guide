@@ -1,0 +1,7 @@
+##Guide(Windows)##
+1. Git 설치
+2.accounts.json
+: C:\Users\{User}\AppData\Local 아래에 \Atlassian\SourceTree 경로를 생성한 후에, accounts.json 파일을 이동
+2. SourceTree MSI 파일로 설치
+: MeXX라는 옵션 해제
+: gitbucket과 같이, 비정형 호스팅 시스템은 바로 clone받아서 진행
