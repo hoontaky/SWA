@@ -1,0 +1,10 @@
+# WEB-WAS 간 통신 옵션 추가
+- WAS의 server.xml에서 AJP 통신 옵션
+: acceptCount 10 > 20
+: connectionTimeout 60000 > 300000
+: maxThreads 256 > 500
+: maxConnections 8192
+
+- WEB의 workers.properties
+: worker.tomcat.connection_pool_size=500(maxThreads와 동일하게 설정)
+: worker.tomcat.connection_pool_timetout=120
