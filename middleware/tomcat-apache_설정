@@ -1,4 +1,4 @@
-# WEB-WAS 간 통신 옵션 추가
+# WEB-WAS 간 통신 옵션 추가(Innorix 업로드 이슈로 발생 대응)
 - WAS의 server.xml에서 AJP 통신 옵션
 : acceptCount 10 > 20
 : connectionTimeout 60000 > 300000
